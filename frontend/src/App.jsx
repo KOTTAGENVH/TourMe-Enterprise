@@ -5,6 +5,7 @@ import ForgetPassword from "./Pages/Authentication/ForgetPassword";
 import Home from "./Pages/Destination/Home";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import lighbackground from "../src/Resources/TourMeBackground2.jpeg";
 import darkbackground from "../src/Resources/TourMeBackgroundDark.jpeg";
 import Checkpassword from "./Pages/Destination/Components/AdminAccess/checkpasswordAdd";

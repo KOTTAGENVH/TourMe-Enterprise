@@ -1,6 +1,6 @@
 import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import MuiAppBar from "@mui/material/AppBar";
@@ -11,7 +11,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import Modal from "@mui/material/Modal";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -36,6 +36,11 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import { ToastContainer, toast } from "react-toastify";
+import Iframe from "react-iframe";
+import GoogleMapImage1 from "../../Resources/GoogleMap1.png";
+import GoogleMapImage2 from "../../Resources/GoogleMap2.png";
+import GoogleMapImage3 from "../../Resources/GoogleMap3.png";
+import GoogleMapImage4 from "../../Resources/GoogleMap4.png";
 
 function Copyright(props) {
   return (
@@ -110,6 +115,10 @@ export default function AddDestination() {
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
   const [image2, setImage2] = React.useState(null);
+  const [googlemap, setGooglemap] = React.useState(null);
+  const [openmodal, setOpenModal] = React.useState(false);
+  const handleOpen = () => setOpenModal(true);
+  const handleClose = () => setOpenModal(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -129,10 +138,6 @@ export default function AddDestination() {
   };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
@@ -165,12 +170,12 @@ export default function AddDestination() {
   const handleInputChange = (event) => {
     const inputValue = event.target.value;
     if (inputValue < 0) {
-      event.target.value = 0; 
+      event.target.value = 0;
     }
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <AppBar
         position="absolute"
         open={open}
@@ -314,207 +319,378 @@ export default function AddDestination() {
       </Drawer>
       <Box
         sx={{
-          height: "30vhauto",
-          overflow: "auto",
+          height: "80vh auto",
           margin: "10vh",
           padding: "20px",
           width: "90vw",
           display: "flex",
           flexDirection: "column",
-          flexWrap: "wrap",
           backgroundColor: "rgba(255, 255, 255, 0.1)",
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
+          marginBottom: "20px",
         }}
       >
-        <Typography
-          variant="h3"
-          textAlign="center"
-          sx={{ color: handleColor() }}
-        >
-          Add Destination
-        </Typography>
-        <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="outlined-basic"
-              label="Destination Name"
-              variant="outlined"
-              fullWidth
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="outlined-basic"
-              label="Main Description (Only 100 Characters)"
-              variant="outlined"
-              fullWidth
-              inputProps={{
-                maxLength: 100,
-              }}
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="outlined-multiline-static"
-              label="Description "
-              variant="outlined"
-              multiline
-              fullWidth
-              rows={5}
-              inputProps={{
-                maxLength: 400,
-              }}
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <MuiFileInput
-              sx={{ height: "8vh" }}
-              fullWidth
-              value={image1}
-              label="Upload your image"
-              onChange={setImage1}
-              InputProps={{
-                inputProps: {
-                  accept: "video/*",
-                },
-                endAdornment: <AttachFileIcon />,
-              }}
-            />
-            <MuiFileInput
-              sx={{ height: "8vh" }}
-              fullWidth
-              label="Upload your image"
-              value={image2}
-              onChange={setImage2}
-              InputProps={{
-                inputProps: {
-                  accept: "video/*",
-                },
-                endAdornment: <AttachFileIcon />,
-              }}
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-            }}
+        <div style={{ flex: 1 }}>
+          <Typography
+            variant="h3"
+            textAlign="center"
+            sx={{ color: handleColor() }}
           >
-            <TextField
-              id="outlined-basic"
-              label="Price "
-              variant="outlined"
-              sx={{ marginLeft: "1vw", width: "15vw" }}
-              inputProps={{
-                maxLength: 400,
-                type: "number", 
-                onInput: handleInputChange, 
-              }}
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-
-            <TextField
-              id="outlined-basic"
-              label="No of Tickets "
-              variant="outlined"
-              sx={{ marginLeft: "1vw", width: "15vw" }}
-              inputProps={{
-                maxLength: 400,
-                type: "number", 
-                onInput: handleInputChange, 
-              }}
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="outlined-basic"
-              label="Address 1(House No, Street Name)"
-              variant="outlined"
-              fullWidth
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="outlined-basic-multiline"
-              label="Address 2(City, State, Country, Pincode)"
-              variant="outlined"
-              fullWidth
-              multiline
-              rows={2}
-              InputProps={{
-                sx: {
-                  color: handleColor(),
-                  fontSize: "20px",
-                  borderRadius: "20px",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12}>
-            <Button
-              variant="contained"
+            Add Destination
+          </Typography>
+          <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-basic"
+                label="Destination Name"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-basic"
+                label="Main Description (Only 100 Characters)"
+                variant="outlined"
+                fullWidth
+                inputProps={{
+                  maxLength: 100,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-multiline-static"
+                label="Description "
+                variant="outlined"
+                multiline
+                fullWidth
+                rows={5}
+                inputProps={{
+                  maxLength: 400,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <MuiFileInput
+                sx={{ height: "8vh" }}
+                fullWidth
+                value={image1}
+                label="Upload your image"
+                onChange={setImage1}
+                InputProps={{
+                  inputProps: {
+                    accept: "video/*",
+                  },
+                  endAdornment: <AttachFileIcon />,
+                }}
+              />
+              <MuiFileInput
+                sx={{ height: "8vh" }}
+                fullWidth
+                label="Upload your image"
+                value={image2}
+                onChange={setImage2}
+                InputProps={{
+                  inputProps: {
+                    accept: "video/*",
+                  },
+                  endAdornment: <AttachFileIcon />,
+                }}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={6}
               sx={{
-                marginTop: "4vh",
-                width: "10vw",
-                height: "5vh",
-                marginLeft: "auto",
-                marginRight: "auto",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "black",
-                color: "white",
+                display: "flex",
+                flexDirection: "row",
               }}
             >
-              Add
-            </Button>
+              <TextField
+                id="outlined-basic"
+                label="Price "
+                variant="outlined"
+                sx={{ marginLeft: "1vw", width: "15vw" }}
+                inputProps={{
+                  maxLength: 400,
+                  type: "number",
+                  onInput: handleInputChange,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+
+              <TextField
+                id="outlined-basic"
+                label="No of Tickets "
+                variant="outlined"
+                sx={{ marginLeft: "1vw", width: "15vw" }}
+                inputProps={{
+                  maxLength: 400,
+                  type: "number",
+                  onInput: handleInputChange,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-basic"
+                label="Address 1(House No, Street Name)"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-basic-multiline"
+                label="Address 2(City, State, Country, Pincode)"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={2}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="outlined-basic"
+                label="Add Google Map Link (use embeded map)"
+                variant="outlined"
+                value={googlemap}
+                fullWidth
+                sx={{
+                  marginBottom: "4vh",
+                }}
+                onChange={(e) => {
+                  setGooglemap(e.target.value);
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+              <Button
+                variant="contained"
+                sx={{
+                  width: "17vw",
+                  height: "3vh",
+                  marginLeft: "10vw",
+                  marginRight: "auto",
+                  justifyContent: "right",
+                  alignItems: "right",
+                  backgroundColor: "black",
+                  color: "white",
+                  borderRadius: "20px",
+                }}
+                onClick={() => handleOpen()}
+              >
+                Check how to add google map
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Iframe
+                id="myId"
+                src={googlemap}
+                width="350vw"
+                height="200vh"
+                styles={{ borderRadius: "20px" }}
+                allowfullscreen="true"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              sx={{
+                justifyContent: "right",
+                display: "flex",
+                alignItems: "right",
+              }}
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  marginTop: "4vh",
+                  width: "10vw",
+                  height: "5vh",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "black",
+                  color: "white",
+                }}
+              >
+                Add
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
+        </div>
       </Box>
+      <Modal
+        open={openmodal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 900,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Carousel>
+            <Typography variant="h5" textAlign="center">
+              Step 1 : Follow this link{" "}
+              <Link
+                href="https://www.embed-map.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.embed-map.com
+              </Link>
+            </Typography>
+            <div>
+            <Typography variant="h6" textAlign="center">
+              Step 2 : Enter Location{" "}
+              <Link
+                href="https://www.embed-map.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.embed-map.com
+              </Link>
+            </Typography>
+            <img
+              src={GoogleMapImage1}
+              alt="2"
+              border="0"
+              width="100%"
+              height="100%"
+            />
+            </div>
+            
+            <div>
+            <Typography variant="h6" textAlign="center">
+              Step 3 : Enter Click Generate HTML code{" "}
+              <Link
+                href="https://www.embed-map.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.embed-map.com
+              </Link>
+            </Typography>
+            <img
+              src={GoogleMapImage2}
+              alt="2"
+              border="0"
+              width="100%"
+              height="100%"
+            />
+            </div>
+            <div>
+            <Typography variant="h6" textAlign="center">
+              Step 4 : Copy only url inside the iframe tag near src{" "}
+              <Link
+                href="https://www.embed-map.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.embed-map.com
+              </Link>
+            </Typography>
+            <img
+              src={GoogleMapImage3}
+              alt="2"
+              border="0"
+              width="100%"
+              height="100%"
+            />
+            </div>
+            <div>
+            <Typography variant="h6" textAlign="center">
+              Step 5 :Paste in the textfield and check if the map would appear in a small window to the left{" "}
+              <Link
+                href="https://www.embed-map.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.embed-map.com
+              </Link>
+            </Typography>
+            <img
+              src={GoogleMapImage4}
+              alt="2"
+              border="0"
+              width="100%"
+              height="100%"
+            />
+            </div>
+          </Carousel>
+        </Box>
+      </Modal>
     </Box>
   );
 }
