@@ -17,7 +17,7 @@ export const loginAction = (username, password) => {
       dispatch(setLoginResponse(response));
   
     } catch (error) {
-      dispatch(setMessage(error.response.data.message));
+      dispatch(setMessage(error?.response?.data?.message));
     }
   };
 };

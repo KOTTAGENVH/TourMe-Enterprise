@@ -9,14 +9,13 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { MuiFileInput } from "mui-file-input";
 import MainListItems from "./Components/listItems";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
@@ -33,7 +32,10 @@ import { Image } from "@mui/icons-material";
 import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import { ToastContainer, toast } from "react-toastify";
 
 function Copyright(props) {
   return (
@@ -101,15 +103,26 @@ const Drawer = styled(MuiDrawer, {
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+export default function AddDestination() {
   const settings = ["Profile", "Logout"];
-
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+  const [image1, setImage1] = React.useState(null);
+  const [image2, setImage2] = React.useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const darkmode = useSelector((state) => state.darkmode.darkmode);
+
+  const handleColor = () => {
+    if (darkmode) {
+      return "white";
+    } else {
+      return "black";
+    }
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -147,6 +160,13 @@ export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleInputChange = (event) => {
+    const inputValue = event.target.value;
+    if (inputValue < 0) {
+      event.target.value = 0; 
+    }
   };
 
   return (
@@ -292,6 +312,209 @@ export default function Dashboard() {
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>
+      <Box
+        sx={{
+          height: "30vhauto",
+          overflow: "auto",
+          margin: "10vh",
+          padding: "20px",
+          width: "90vw",
+          display: "flex",
+          flexDirection: "column",
+          flexWrap: "wrap",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "20px",
+        }}
+      >
+        <Typography
+          variant="h3"
+          textAlign="center"
+          sx={{ color: handleColor() }}
+        >
+          Add Destination
+        </Typography>
+        <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="outlined-basic"
+              label="Destination Name"
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="outlined-basic"
+              label="Main Description (Only 100 Characters)"
+              variant="outlined"
+              fullWidth
+              inputProps={{
+                maxLength: 100,
+              }}
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="outlined-multiline-static"
+              label="Description "
+              variant="outlined"
+              multiline
+              fullWidth
+              rows={5}
+              inputProps={{
+                maxLength: 400,
+              }}
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <MuiFileInput
+              sx={{ height: "8vh" }}
+              fullWidth
+              value={image1}
+              label="Upload your image"
+              onChange={setImage1}
+              InputProps={{
+                inputProps: {
+                  accept: "video/*",
+                },
+                endAdornment: <AttachFileIcon />,
+              }}
+            />
+            <MuiFileInput
+              sx={{ height: "8vh" }}
+              fullWidth
+              label="Upload your image"
+              value={image2}
+              onChange={setImage2}
+              InputProps={{
+                inputProps: {
+                  accept: "video/*",
+                },
+                endAdornment: <AttachFileIcon />,
+              }}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+            }}
+          >
+            <TextField
+              id="outlined-basic"
+              label="Price "
+              variant="outlined"
+              sx={{ marginLeft: "1vw", width: "15vw" }}
+              inputProps={{
+                maxLength: 400,
+                type: "number", 
+                onInput: handleInputChange, 
+              }}
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+
+            <TextField
+              id="outlined-basic"
+              label="No of Tickets "
+              variant="outlined"
+              sx={{ marginLeft: "1vw", width: "15vw" }}
+              inputProps={{
+                maxLength: 400,
+                type: "number", 
+                onInput: handleInputChange, 
+              }}
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="outlined-basic"
+              label="Address 1(House No, Street Name)"
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="outlined-basic-multiline"
+              label="Address 2(City, State, Country, Pincode)"
+              variant="outlined"
+              fullWidth
+              multiline
+              rows={2}
+              InputProps={{
+                sx: {
+                  color: handleColor(),
+                  fontSize: "20px",
+                  borderRadius: "20px",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <Button
+              variant="contained"
+              sx={{
+                marginTop: "4vh",
+                width: "10vw",
+                height: "5vh",
+                marginLeft: "auto",
+                marginRight: "auto",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "black",
+                color: "white",
+              }}
+            >
+              Add
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
     </Box>
   );
 }
