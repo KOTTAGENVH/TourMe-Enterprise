@@ -24,11 +24,12 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { ToastContainer, toast } from "react-toastify";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 function Checkpassword() {
-  const [darkMode, setDarkMode] = React.useState(false);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [password, setPassword] = React.useState("");
+  const [darkMode, setDarkMode] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [password, setPassword] = useState("");
   const { pass } = useParams();
 
   const dispatch = useDispatch();
@@ -199,7 +200,7 @@ function Checkpassword() {
           fullWidth
           variant="standard"
           sx={{
-            textAlign: "center", 
+            textAlign: "center",
             justifyContent: "center",
             marginTop: "4vh",
           }}

@@ -22,7 +22,7 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
+import { addDestination } from "../../Api/services/destinationService";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -34,6 +34,7 @@ import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { MuiTelInput } from "mui-tel-input";
 import TextField from "@mui/material/TextField";
 import { ToastContainer, toast } from "react-toastify";
 import Iframe from "react-iframe";
@@ -41,6 +42,10 @@ import GoogleMapImage1 from "../../Resources/GoogleMap1.png";
 import GoogleMapImage2 from "../../Resources/GoogleMap2.png";
 import GoogleMapImage3 from "../../Resources/GoogleMap3.png";
 import GoogleMapImage4 from "../../Resources/GoogleMap4.png";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../../Api/firebase";
+import { useState } from "react";
+import * as Yup from "yup";
 
 function Copyright(props) {
   return (
@@ -117,6 +122,27 @@ export default function AddDestination() {
   const [image2, setImage2] = React.useState(null);
   const [googlemap, setGooglemap] = React.useState(null);
   const [openmodal, setOpenModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [title, setTitle] = useState("");
+  const [maindescription, setMaindescription] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [NoTickets, setNoTickets] = useState("");
+  const [Address, setAddress] = useState("");
+  const [Address1, setAddress1] = useState("");
+  const [tel, setTel] = useState("");
+  const [titleerror, setTitleerror] = useState("");
+  const [maindescriptionerror, setMaindescriptionerror] = useState("");
+  const [descriptionerror, setDescriptionerror] = useState("");
+  const [priceerror, setPriceerror] = useState("");
+  const [NoTicketserror, setNoTicketserror] = useState("");
+  const [Addresserror, setAddresserror] = useState("");
+  const [Address1error, setAddress1error] = useState("");
+  const [image1error, setImage1error] = useState("");
+  const [image2error, setImage2error] = useState("");
+  const [googlemaperror, setGooglemaperror] = useState("");
+  const [telerror, setTelerror] = useState("");
+
   const handleOpen = () => setOpenModal(true);
   const handleClose = () => setOpenModal(false);
 
@@ -124,7 +150,7 @@ export default function AddDestination() {
   const navigate = useNavigate();
 
   const darkmode = useSelector((state) => state.darkmode.darkmode);
-
+  const loggedUser = useSelector((state) => state.auth.loggedUser);
   const handleColor = () => {
     if (darkmode) {
       return "white";
@@ -174,6 +200,210 @@ export default function AddDestination() {
     }
   };
 
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().trim().required("Destination Name is required"),
+    maindescription: Yup.string()
+      .max(100, "Main Description must be at most 100 characters")
+      .trim()
+      .required("Main Description is required"),
+    description: Yup.string()
+      .max(400, "Description must be at most 400 characters")
+      .trim()
+      .required("Description is required"),
+    image1: Yup.mixed()
+      .required("Image is required")
+      .test(
+        "fileSize",
+        "File size is too large. Maximum size is 5MB.",
+        (value) => value && value.size <= 5000000
+      )
+      .test(
+        "fileType",
+        "Unsupported file type. Please upload an image.",
+        (value) => value && ["image/jpeg", "image/png"].includes(value.type)
+      ),
+    image2: Yup.mixed()
+      .required("Image is required")
+      .test(
+        "fileSize",
+        "File size is too large. Maximum size is 5MB.",
+        (value) => value && value.size <= 5000000
+      )
+      .test(
+        "fileType",
+        "Unsupported file type. Please upload an image.",
+        (value) => value && ["image/jpeg", "image/png"].includes(value.type)
+      ),
+    price: Yup.number()
+      .required("Price is required")
+      .positive("Price must be greater than 0"),
+    NoTickets: Yup.number()
+      .required("Number of Tickets is required")
+      .integer("Number of Tickets must be an integer"),
+    Address: Yup.string().trim().required("Address is required"),
+    Address1: Yup.string().trim().required("Address is required"),
+    googlemap: Yup.string().trim().required("Location is required"),
+    tel: Yup.string().trim().required("Telephone is required"),
+  });
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+    setTitleerror("");
+  };
+
+  const handleMaindescriptionChange = (e) => {
+    setMaindescription(e.target.value);
+    setMaindescriptionerror("");
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+    setDescriptionerror("");
+  };
+
+  const handleImage1Change = (e) => {
+    setImage1(e);
+    setImage1error("");
+  };
+
+  const handleImage2Change = (e) => {
+    setImage2(e);
+    setImage2error("");
+  };
+
+  const handlePriceChange = (e) => {
+    setPrice(e.target.value);
+    setPriceerror("");
+  };
+
+  const handleNoTicketsChange = (e) => {
+    setNoTickets(e.target.value);
+    setNoTicketserror("");
+  };
+
+  const handleAddressChange = (e) => {
+    setAddress(e.target.value);
+    setAddresserror("");
+  };
+
+  const handleAddress1Change = (e) => {
+    setAddress1(e.target.value);
+    setAddress1error("");
+  };
+
+  const handleGooglemapChange = (e) => {
+    setGooglemap(e.target.value);
+    setGooglemaperror("");
+  };
+
+  const handleTelChange = (e) => {
+    setTel(e);
+    setTelerror("");
+  };
+
+  const handleSubmit = async (e) => {
+    try {
+      setLoading(true);
+
+      // Validate the form data
+      await validationSchema.validate(
+        {
+          title,
+          maindescription,
+          description,
+          image1,
+          image2,
+          price,
+          NoTickets,
+          Address,
+          Address1,
+          googlemap,
+          tel,
+        },
+        { abortEarly: false }
+      );
+
+      let url1 = "";
+      let url2 = "";
+
+      if (image1 !== null && image2 !== null) {
+        const storage1Ref = ref(storage, image1?.name);
+        const storage2Ref = ref(storage, image2?.name);
+
+        const uploadTask1 = await uploadBytes(storage1Ref, image1);
+        url1 = await getDownloadURL(uploadTask1.ref);
+
+        const uploadTask2 = await uploadBytes(storage2Ref, image2);
+        url2 = await getDownloadURL(uploadTask2.ref);
+      }
+
+      console.log("url1", url1);
+      console.log("url2", url2);
+
+      await addDestination(
+        title,
+        maindescription,
+        description,
+        url1,
+        url2,
+        price,
+        NoTickets,
+        Address,
+        Address1,
+        googlemap,
+        loggedUser?.username,
+        loggedUser?.email,
+        tel
+      );
+
+      toast.success("Destination Added Successfully");
+      navigate("/home");
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("Error Adding Destination", error);
+      toast.error("Error Adding Destination");
+
+      if (error.name === "ValidationError") {
+        error.inner.forEach((e) => {
+          switch (e.path) {
+            case "title":
+              setTitleerror(e.message);
+              break;
+            case "maindescription":
+              setMaindescriptionerror(e.message);
+              break;
+            case "description":
+              setDescriptionerror(e.message);
+              break;
+            case "image1":
+              setImage1error(e.message);
+              break;
+            case "image2":
+              setImage2error(e.message);
+              break;
+            case "price":
+              setPriceerror(e.message);
+              break;
+            case "NoTickets":
+              setNoTicketserror(e.message);
+              break;
+            case "Address":
+              setAddresserror(e.message);
+              break;
+            case "Address1":
+              setAddress1error(e.message);
+              break;
+            case "googlemap":
+              setGooglemaperror(e.message);
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    }
+  };
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <AppBar
@@ -331,6 +561,7 @@ export default function AddDestination() {
           marginBottom: "20px",
         }}
       >
+        <ToastContainer />
         <div style={{ flex: 1 }}>
           <Typography
             variant="h3"
@@ -346,6 +577,12 @@ export default function AddDestination() {
                 label="Destination Name"
                 variant="outlined"
                 fullWidth
+                value={title}
+                onChange={(e) => {
+                  handleTitleChange(e);
+                }}
+                helperText={titleerror}
+                error={false}
                 InputProps={{
                   sx: {
                     color: handleColor(),
@@ -361,6 +598,12 @@ export default function AddDestination() {
                 label="Main Description (Only 100 Characters)"
                 variant="outlined"
                 fullWidth
+                value={maindescription}
+                onChange={(e) => {
+                  handleMaindescriptionChange(e);
+                }}
+                helperText={maindescriptionerror}
+                error={false}
                 inputProps={{
                   maxLength: 100,
                 }}
@@ -380,6 +623,11 @@ export default function AddDestination() {
                 variant="outlined"
                 multiline
                 fullWidth
+                value={description}
+                onChange={(e) => {
+                  handleDescriptionChange(e);
+                }}
+                helperText={descriptionerror}
                 rows={5}
                 inputProps={{
                   maxLength: 400,
@@ -399,10 +647,14 @@ export default function AddDestination() {
                 fullWidth
                 value={image1}
                 label="Upload your image"
-                onChange={setImage1}
+                onChange={(e) => {
+                  handleImage1Change(e);
+                }}
+                helperText={image1error}
+                error={false}
                 InputProps={{
                   inputProps: {
-                    accept: "video/*",
+                    accept: "image/*",
                   },
                   endAdornment: <AttachFileIcon />,
                 }}
@@ -410,12 +662,16 @@ export default function AddDestination() {
               <MuiFileInput
                 sx={{ height: "8vh" }}
                 fullWidth
+                error={false}
                 label="Upload your image"
                 value={image2}
-                onChange={setImage2}
+                helperText={image2error}
+                onChange={(e) => {
+                  handleImage2Change(e);
+                }}
                 InputProps={{
                   inputProps: {
-                    accept: "video/*",
+                    accept: "image/*",
                   },
                   endAdornment: <AttachFileIcon />,
                 }}
@@ -434,6 +690,12 @@ export default function AddDestination() {
                 id="outlined-basic"
                 label="Price "
                 variant="outlined"
+                value={price}
+                onChange={(e) => {
+                  handlePriceChange(e);
+                }}
+                error={false}
+                helperText={priceerror}
                 sx={{ marginLeft: "1vw", width: "15vw" }}
                 inputProps={{
                   maxLength: 400,
@@ -453,6 +715,12 @@ export default function AddDestination() {
                 id="outlined-basic"
                 label="No of Tickets "
                 variant="outlined"
+                value={NoTickets}
+                onChange={(e) => {
+                  handleNoTicketsChange(e);
+                }}
+                error={false}
+                helperText={NoTicketserror}
                 sx={{ marginLeft: "1vw", width: "15vw" }}
                 inputProps={{
                   maxLength: 400,
@@ -468,26 +736,18 @@ export default function AddDestination() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="outlined-basic"
-                label="Address 1(House No, Street Name)"
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                  sx: {
-                    color: handleColor(),
-                    fontSize: "20px",
-                    borderRadius: "20px",
-                  },
-                }}
-              />
-            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 id="outlined-basic-multiline"
                 label="Address 2(City, State, Country, Pincode)"
                 variant="outlined"
+                value={Address1}
+                onChange={(e) => {
+                  handleAddress1Change(e);
+                }}
+                helperText={Address1error}
+                error={false}
                 fullWidth
                 multiline
                 rows={2}
@@ -503,16 +763,15 @@ export default function AddDestination() {
             <Grid item xs={12} sm={6}>
               <TextField
                 id="outlined-basic"
-                label="Add Google Map Link (use embeded map)"
+                label="Address 1(House No, Street Name)"
                 variant="outlined"
-                value={googlemap}
-                fullWidth
-                sx={{
-                  marginBottom: "4vh",
-                }}
+                value={Address}
                 onChange={(e) => {
-                  setGooglemap(e.target.value);
+                  handleAddressChange(e);
                 }}
+                helperText={Addresserror}
+                error={false}
+                fullWidth
                 InputProps={{
                   sx: {
                     color: handleColor(),
@@ -521,6 +780,47 @@ export default function AddDestination() {
                   },
                 }}
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Add Google Map Link (use embeded map)"
+                  variant="outlined"
+                  value={googlemap}
+                  helperText={googlemaperror}
+                  sx={{
+                    marginBottom: "2vh",
+                  }}
+                  onChange={(e) => {
+                    handleGooglemapChange(e);
+                  }}
+                  error={false}
+                  InputProps={{
+                    sx: {
+                      color: handleColor(),
+                      fontSize: "20px",
+                      borderRadius: "20px",
+                    },
+                  }}
+                />
+                <MuiTelInput
+                  value={tel}
+                  onChange={(e) => {
+                    handleTelChange(e);
+                  }}
+                  style={{
+                    color: handleColor(),
+                  }}
+                  label="Telephone"
+                />
+              </div>
               <Button
                 variant="contained"
                 sx={{
@@ -574,6 +874,7 @@ export default function AddDestination() {
                   backgroundColor: "black",
                   color: "white",
                 }}
+                onClick={handleSubmit}
               >
                 Add
               </Button>
@@ -612,81 +913,82 @@ export default function AddDestination() {
               </Link>
             </Typography>
             <div>
-            <Typography variant="h6" textAlign="center">
-              Step 2 : Enter Location{" "}
-              <Link
-                href="https://www.embed-map.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://www.embed-map.com
-              </Link>
-            </Typography>
-            <img
-              src={GoogleMapImage1}
-              alt="2"
-              border="0"
-              width="100%"
-              height="100%"
-            />
+              <Typography variant="h6" textAlign="center">
+                Step 2 : Enter Location{" "}
+                <Link
+                  href="https://www.embed-map.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.embed-map.com
+                </Link>
+              </Typography>
+              <img
+                src={GoogleMapImage1}
+                alt="2"
+                border="0"
+                width="100%"
+                height="100%"
+              />
             </div>
-            
+
             <div>
-            <Typography variant="h6" textAlign="center">
-              Step 3 : Enter Click Generate HTML code{" "}
-              <Link
-                href="https://www.embed-map.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://www.embed-map.com
-              </Link>
-            </Typography>
-            <img
-              src={GoogleMapImage2}
-              alt="2"
-              border="0"
-              width="100%"
-              height="100%"
-            />
-            </div>
-            <div>
-            <Typography variant="h6" textAlign="center">
-              Step 4 : Copy only url inside the iframe tag near src{" "}
-              <Link
-                href="https://www.embed-map.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://www.embed-map.com
-              </Link>
-            </Typography>
-            <img
-              src={GoogleMapImage3}
-              alt="2"
-              border="0"
-              width="100%"
-              height="100%"
-            />
+              <Typography variant="h6" textAlign="center">
+                Step 3 : Enter Click Generate HTML code{" "}
+                <Link
+                  href="https://www.embed-map.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.embed-map.com
+                </Link>
+              </Typography>
+              <img
+                src={GoogleMapImage2}
+                alt="2"
+                border="0"
+                width="100%"
+                height="100%"
+              />
             </div>
             <div>
-            <Typography variant="h6" textAlign="center">
-              Step 5 :Paste in the textfield and check if the map would appear in a small window to the left{" "}
-              <Link
-                href="https://www.embed-map.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://www.embed-map.com
-              </Link>
-            </Typography>
-            <img
-              src={GoogleMapImage4}
-              alt="2"
-              border="0"
-              width="100%"
-              height="100%"
-            />
+              <Typography variant="h6" textAlign="center">
+                Step 4 : Copy only url inside the iframe tag near src{" "}
+                <Link
+                  href="https://www.embed-map.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.embed-map.com
+                </Link>
+              </Typography>
+              <img
+                src={GoogleMapImage3}
+                alt="2"
+                border="0"
+                width="100%"
+                height="100%"
+              />
+            </div>
+            <div>
+              <Typography variant="h6" textAlign="center">
+                Step 5 :Paste in the textfield and check if the map would appear
+                in a small window to the left{" "}
+                <Link
+                  href="https://www.embed-map.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://www.embed-map.com
+                </Link>
+              </Typography>
+              <img
+                src={GoogleMapImage4}
+                alt="2"
+                border="0"
+                width="100%"
+                height="100%"
+              />
             </div>
           </Carousel>
         </Box>

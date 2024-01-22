@@ -4,17 +4,19 @@ import { signIn } from "../../Api/services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import CircularProgress from "@mui/material/CircularProgress";
 import { loginAction } from "../../Redux/auth/authAction";
-import { useDispatch,  } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function SignIn() {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const validUser = useSelector((state) => state.auth.message);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -23,12 +25,14 @@ function SignIn() {
         toast.error("Please fill all the fields");
         return;
       }
-      dispatch(loginAction(username, password)); 
-      navigate("/home", { replace: true });
-      toast.success("Sign In Successful");
-      setUsername("");
-      setPassword("");
-
+      const status = await dispatch(loginAction(username, password));
+      if (status !== "Invalid Credentials") {
+        toast.success("Login successful");
+        navigate("/home");        
+      } else {
+        console.log("status", status);
+        toast.error("Invalid Credentials");
+      }
     } catch (err) {
       toast.error("Sign In Failed");
     }

@@ -18,6 +18,8 @@ const MainListItems = () => {
   const { 0: firstParam } = useParams();
   const darkmode = useSelector((state) => state.darkmode.darkmode);
   const isAddDestination = window.location.pathname.includes("addDestination");
+  const isDashboard = window.location.pathname.includes("home");
+  const isViewAllDestination = window.location.pathname.includes("viewall");
 
   const handleColor = () => {
     if (darkmode) {
@@ -25,7 +27,7 @@ const MainListItems = () => {
     } else {
       return "black";
     }
-  }
+  };
 
   const handleBackgroundColor = () => {
     if (darkmode) {
@@ -33,13 +35,23 @@ const MainListItems = () => {
     } else {
       return "Bisque";
     }
-  }
+  };
 
   return (
     <React.Fragment>
-      <ListItemButton>
+      <ListItemButton
+        onClick={() => {
+          navigate("/home");
+        }}
+        sx={{
+          backgroundColor: isDashboard ? handleBackgroundColor() : "inherit",
+          color: isDashboard ? handleColor() : "inherit",
+        }}
+      >
         <ListItemIcon>
-          <DashboardIcon />
+          <DashboardIcon
+            sx={{ color: isDashboard ? handleColor() : "inherit" }}
+          />
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItemButton>
@@ -55,10 +67,17 @@ const MainListItems = () => {
         onClick={() => {
           navigate("/adminaccess/add");
         }}
-        sx={{ backgroundColor: isAddDestination ? handleBackgroundColor() : "inherit", color: isAddDestination ? handleColor() : "inherit" }}
+        sx={{
+          backgroundColor: isAddDestination
+            ? handleBackgroundColor()
+            : "inherit",
+          color: isAddDestination ? handleColor() : "inherit",
+        }}
       >
         <ListItemIcon>
-          <AddIcon sx={{color: isAddDestination ? handleColor() : "inherit"}}/>
+          <AddIcon
+            sx={{ color: isAddDestination ? handleColor() : "inherit" }}
+          />
         </ListItemIcon>
         <ListItemText primary="Add" />
       </ListItemButton>
