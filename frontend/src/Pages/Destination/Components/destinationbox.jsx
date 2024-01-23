@@ -48,13 +48,18 @@ function Destinationbox({
     navigate("/viewOne");
   };
 
+  const handleUpdate = (id) => {
+    dispatch(setidAction(id));
+    navigate("/adminaccess/update");
+  }
+
   return (
     <>
       <ToastContainer />
       <Box
         sx={{
           width: "25vw",
-          height: "500px auto",
+          height: "500px",
           background: "rgba(255, 255, 255, 0.1)",
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
@@ -114,6 +119,7 @@ function Destinationbox({
               fontSize: "15px",
               fontWeight: "bold",
             }}
+            onClick={() => handleUpdate(_id)}
           >
             Update
           </Button>

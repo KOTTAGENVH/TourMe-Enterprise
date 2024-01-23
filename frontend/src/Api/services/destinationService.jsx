@@ -90,3 +90,46 @@ export const getDestinationById = async (id) => {
     return error;
   }
 };
+
+//Update Destination By Id
+export const updateDestinationById = async (
+  id,
+  title,
+  maindescription,
+  description,
+  image,
+  image1,
+  price,
+  NoTickets,
+  Address,
+  Address1,
+  location,
+  username,
+  useremail,
+  usertel
+) => {
+  try {
+    const response = await apiClient.patch(
+      `/destination/update-destination/${id}`,
+      {
+        title,
+        maindescription,
+        description,
+        image,
+        image1,
+        price,
+        NoTickets,
+        Address,
+        Address1,
+        location,
+        username,
+        useremail,
+        usertel,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

@@ -70,9 +70,10 @@ function Checkpassword() {
         setPassword("");
         if (pass === "add") {
           navigate("/addDestination");
+        }else if (pass === "update") {
+          navigate("/update");
         }
       } else {
-        console.log(password);
         toast.error("Admin Access Denied");
         setPassword("");
       }

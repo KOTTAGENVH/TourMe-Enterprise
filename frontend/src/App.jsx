@@ -12,8 +12,9 @@ import Checkpassword from "./Pages/Destination/Components/AdminAccess/checkpassw
 import AddDestination from "./Pages/Destination/AddDestination";
 import ViewAllDestination from "./Pages/Destination/ViewAllDestination";
 import ViewOneDestination from "./Pages/Destination/viewOneDestination";
-import 'swiper/css';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/pagination";
+import UpdateDestination from "./Pages/Destination/updateDestination";
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const darkmode = useSelector((state) => state.darkmode.darkmode);
@@ -53,6 +54,7 @@ function App() {
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
               <Route path="/addDestination" element={<AddDestination />} />
               <Route path="/viewOne" element={<ViewOneDestination />} />
+              <Route path="/update" element={<UpdateDestination />} />
             </>
           )}
         </Routes>
