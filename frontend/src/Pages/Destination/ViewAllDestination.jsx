@@ -3,6 +3,8 @@ import { styled, createTheme } from "@mui/material/styles";
 import { useQuery } from "react-query";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -30,6 +32,8 @@ import { signOutAction } from "../../Redux/auth/authAction";
 import { useNavigate } from "react-router-dom";
 import { getDestinationByEmail } from "../../Api/services/destinationService";
 import Destinationbox from "./Components/destinationbox";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 
 function Copyright(props) {
   return (
@@ -102,6 +106,9 @@ function ViewAllDestination() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+  const [searchText, setSearchText] = React.useState("");
+  const [showClearIcon, setShowClearIcon] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const darkmode = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
@@ -142,9 +149,19 @@ function ViewAllDestination() {
     }
   };
 
-  const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setSearchText(value);
+    setShowClearIcon(value !== "");
+  };
+
+  const handleClearClick = () => {
+    setSearchText("");
+    setShowClearIcon(false);
   };
 
   const handleColor = () => {
@@ -158,6 +175,11 @@ function ViewAllDestination() {
   const { data, isLoading, error, isError } = useQuery({
     queryFn: () => getDestinationByEmail(loggedUser?.email),
   });
+
+  // Filtering destinations based on the search text
+  const filteredDestinations = data?.destinations?.filter((destination) =>
+    destination.title.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -305,34 +327,70 @@ function ViewAllDestination() {
       </Drawer>
 
       {data !== undefined && data.length !== 0 ? (
-        <div
-          style={{
-            marginTop: "80px",
-            display: "flex",
-            flexWrap: "wrap",
-            flexDirection: "row",
-            marginLeft: "30px",
-          }}
-        >
-          {data?.destinations?.map((destination) => (
-            <Destinationbox
-              _id={destination._id}
-              title={destination.title}
-              maindescription={destination.maindescription}
-              description={destination.description}
-              image={destination.image}
-              image1={destination.image1}
-              price={destination.price}
-              NoTickets={destination.NoTickets}
-              Address={destination.Address}
-              Address1={destination.Address1}
-              rating={destination.rating}
-              location={destination.location}
-              username={destination.username}
-              useremail={destination.useremail}
-              usertel={destination.usertel}
-            />
-          ))}
+        <div>
+          <TextField
+            required
+            id="standard-required"
+            defaultValue="Search"
+            endAdornmentIcon={<SearchIcon />}
+            variant="standard"
+            value={searchText}
+            onChange={handleInputChange}
+            sx={{
+              marginTop: "80px",
+              marginLeft: "80%",
+              width: "30vw",
+              height: "50px",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              backdropFilter: "blur(10px)",
+              justifyContent: "center",
+              alignItems: "center",
+              alignSelf: "center",
+              justifySelf: "center",
+              borderRadius: "20px",
+              input: { color: handleColor(), width: "27vw" },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {showClearIcon ? (
+                    <SearchOffIcon onClick={handleClearClick} />
+                  ) : (
+                    <SearchIcon />
+                  )}
+                </InputAdornment>
+              ),
+            }}
+          />
+          <div
+            style={{
+              marginTop: "30px",
+              display: "flex",
+              flexWrap: "wrap",
+              flexDirection: "row",
+              marginLeft: "30px",
+            }}
+          >
+            {filteredDestinations?.map((destination) => (
+              <Destinationbox
+                _id={destination._id}
+                title={destination.title}
+                maindescription={destination.maindescription}
+                description={destination.description}
+                image={destination.image}
+                image1={destination.image1}
+                price={destination.price}
+                NoTickets={destination.NoTickets}
+                Address={destination.Address}
+                Address1={destination.Address1}
+                rating={destination.rating}
+                location={destination.location}
+                username={destination.username}
+                useremail={destination.useremail}
+                usertel={destination.usertel}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <Typography
