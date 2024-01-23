@@ -10,7 +10,10 @@ import lighbackground from "../src/Resources/TourMeBackground2.jpeg";
 import darkbackground from "../src/Resources/TourMeBackgroundDark.jpeg";
 import Checkpassword from "./Pages/Destination/Components/AdminAccess/checkpasswordAdd";
 import AddDestination from "./Pages/Destination/AddDestination";
-
+import ViewAllDestination from "./Pages/Destination/ViewAllDestination";
+import ViewOneDestination from "./Pages/Destination/viewOneDestination";
+import 'swiper/css';
+import 'swiper/css/pagination';
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const darkmode = useSelector((state) => state.darkmode.darkmode);
@@ -46,8 +49,10 @@ function App() {
           {loggedUser.role === "destination" && (
             <>
               <Route path="/home" element={<Home />} />
+              <Route path="/viewall" element={<ViewAllDestination />} />
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
               <Route path="/addDestination" element={<AddDestination />} />
+              <Route path="/viewOne" element={<ViewOneDestination />} />
             </>
           )}
         </Routes>

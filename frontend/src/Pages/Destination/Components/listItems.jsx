@@ -12,6 +12,7 @@ import Divider from "@mui/material/Divider";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Title } from "@mui/icons-material";
 
 const MainListItems = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const MainListItems = () => {
   const isAddDestination = window.location.pathname.includes("addDestination");
   const isDashboard = window.location.pathname.includes("home");
   const isViewAllDestination = window.location.pathname.includes("viewall");
+  const isViewOneDestination = window.location.pathname.includes("viewOne");
 
   const handleColor = () => {
     if (darkmode) {
@@ -56,9 +58,21 @@ const MainListItems = () => {
         <ListItemText primary="Dashboard" />
       </ListItemButton>
       <Divider />
-      <ListItemButton>
+      <ListItemButton
+        onClick={() => {
+          navigate("/viewall");
+        }} 
+        sx={{
+          backgroundColor: isViewAllDestination||isViewOneDestination
+            ? handleBackgroundColor()
+            : "inherit",
+          color: isViewAllDestination||isViewOneDestination ? handleColor() : "inherit",
+        }}
+      >
         <ListItemIcon>
-          <CorporateFareIcon />
+          <CorporateFareIcon
+            sx={{ color: isViewAllDestination ? handleColor() : "inherit" }}
+          />
         </ListItemIcon>
         <ListItemText primary="View All" />
       </ListItemButton>

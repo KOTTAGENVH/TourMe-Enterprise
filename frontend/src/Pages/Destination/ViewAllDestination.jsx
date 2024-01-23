@@ -1,6 +1,6 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import { styled, createTheme } from "@mui/material/styles";
+import { useQuery } from "react-query";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import MuiAppBar from "@mui/material/AppBar";
@@ -9,31 +9,27 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import { useSelector } from "react-redux";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { ToastContainer } from "react-toastify";
 import MainListItems from "./Components/listItems";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Brightness5Icon from "@mui/icons-material/Brightness5";
 import Brightness3Icon from "@mui/icons-material/Brightness3";
-import { Image } from "@mui/icons-material";
 import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
 import { useNavigate } from "react-router-dom";
+import { getDestinationByEmail } from "../../Api/services/destinationService";
+import Destinationbox from "./Components/destinationbox";
 
 function Copyright(props) {
   return (
@@ -101,12 +97,14 @@ const Drawer = styled(MuiDrawer, {
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+function ViewAllDestination() {
   const settings = ["Profile", "Logout"];
-
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+
+  const darkmode = useSelector((state) => state.darkmode.darkmode);
+  const loggedUser = useSelector((state) => state.auth.loggedUser);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -149,8 +147,21 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
+  const handleColor = () => {
+    if (darkmode) {
+      return "white";
+    } else {
+      return "black";
+    }
+  };
+
+  const { data, isLoading, error, isError } = useQuery({
+    queryFn: () => getDestinationByEmail(loggedUser?.email),
+  });
+
   return (
     <Box sx={{ display: "flex" }}>
+      <ToastContainer />
       <AppBar
         position="absolute"
         open={open}
@@ -292,7 +303,59 @@ export default function Dashboard() {
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>
-     
+
+      {data !== undefined && data.length !== 0 ? (
+        <div
+          style={{
+            marginTop: "80px",
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: "row",
+            marginLeft: "30px",
+          }}
+        >
+          {data?.destinations?.map((destination) => (
+            <Destinationbox
+              _id={destination._id}
+              title={destination.title}
+              maindescription={destination.maindescription}
+              description={destination.description}
+              image={destination.image}
+              image1={destination.image1}
+              price={destination.price}
+              NoTickets={destination.NoTickets}
+              Address={destination.Address}
+              Address1={destination.Address1}
+              rating={destination.rating}
+              location={destination.location}
+              username={destination.username}
+              useremail={destination.useremail}
+              usertel={destination.usertel}
+            />
+          ))}
+        </div>
+      ) : (
+        <Typography
+          component="h1"
+          variant="h6"
+          color="inherit"
+          noWrap
+          sx={{
+            fontSize: "50px",
+            justifyContent: "center",
+            alignItems: "center",
+            display: "flex",
+            marginLeft: "20%",
+            marginRight: "20%",
+            color: handleColor(),
+            width: "100%",
+          }}
+        >
+          Sorry No Destinations Available!
+        </Typography>
+      )}
     </Box>
   );
 }
+
+export default ViewAllDestination;

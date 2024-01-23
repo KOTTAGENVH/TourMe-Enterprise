@@ -40,3 +40,53 @@ export const addDestination = async (
     return error;
   }
 };
+
+//Get All Destinations
+export const getAllDestinations = async () => {
+  try {
+    const response = await apiClient.get("/destination/get-all-destinations");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+//Get Destination By Email
+export const getDestinationByEmail = async (email) => {
+  try {
+    const response = await apiClient.get(
+      `/destination/get-destination-by-useremail/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+//Delete Destination By Id
+export const deleteDestinationById = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/destination/delete-destination/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+//Get Destination By Id
+export const getDestinationById = async (id) => {
+  try {
+    const response = await apiClient.get(
+      `/destination/get-destination-by-id/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

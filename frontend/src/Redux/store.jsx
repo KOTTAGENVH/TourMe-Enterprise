@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import authSlice from "./auth/authSlice";
 import { dark } from "@mui/material/styles/createPalette";
 import darkmodeSlice from "./darkmode/darkmodeSlice";
+import  idSlice  from "./storeid/storeidSlice";
 
 const persistConfig = {
   key: "root",
@@ -12,11 +13,13 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, authSlice);
 const persistedReducerdark = persistReducer(persistConfig, darkmodeSlice);
+const persistedReducerid = persistReducer(persistConfig, idSlice);
 
 const store = configureStore({
   reducer: {
     auth: persistedReducer,
     darkmode: persistedReducerdark,
+    id: persistedReducerid,
   },
 });
 

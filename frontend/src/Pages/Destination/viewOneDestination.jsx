@@ -1,39 +1,43 @@
-import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useQuery } from "react-query";
+import { getDestinationById } from "../../Api/services/destinationService";
+import { styled, createTheme } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { ToastContainer } from "react-toastify";
 import MainListItems from "./Components/listItems";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Brightness5Icon from "@mui/icons-material/Brightness5";
 import Brightness3Icon from "@mui/icons-material/Brightness3";
-import { Image } from "@mui/icons-material";
 import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
 import { useNavigate } from "react-router-dom";
+import Iframe from "react-iframe";
+import Rating from "@mui/material/Rating";
+import {
+  MDBCarousel,
+  MDBCarouselItem,
+  MDBCarouselCaption,
+} from "mdb-react-ui-kit";
 
 function Copyright(props) {
   return (
@@ -101,12 +105,15 @@ const Drawer = styled(MuiDrawer, {
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+function ViewOneDestination() {
   const settings = ["Profile", "Logout"];
-
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+
+  const darkmode = useSelector((state) => state.darkmode.darkmode);
+  const loggedUser = useSelector((state) => state.auth.loggedUser);
+  const idState = useSelector((state) => state.id.id);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -149,8 +156,21 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
+  const handleColor = () => {
+    if (darkmode) {
+      return "white";
+    } else {
+      return "black";
+    }
+  };
+
+  const { data, isLoading, error, isError } = useQuery({
+    queryFn: () => getDestinationById(idState),
+  });
+
   return (
     <Box sx={{ display: "flex" }}>
+      <ToastContainer />
       <AppBar
         position="absolute"
         open={open}
@@ -273,6 +293,7 @@ export default function Dashboard() {
             height: "100vh",
           },
         }}
+        ModalProps={{ disableScrollLock: true }}
       >
         <Toolbar
           sx={{
@@ -292,7 +313,242 @@ export default function Dashboard() {
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>
-     
+
+      {data !== undefined && data.length !== 0 ? (
+        <div
+          style={{
+            marginTop: "80px",
+            marginLeft: "30px",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              color: handleColor(),
+              backdropFilter: "blur(10px)",
+              borderRadius: "20px",
+              width: "80vw",
+              height: "85vh",
+              margin: "20px",
+              overflowX: "auto",
+            }}
+          >
+            <Button
+              sx={{
+                margin: "20px",
+                justifyContent: "left",
+                alignContent: "left",
+                alignSelf: "left",
+                fontSize: "20px",
+              }}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => {
+                navigate("/viewall");
+              }}
+            >
+              Back
+            </Button>
+            <Typography
+              variant="h4"
+              sx={{
+                color: handleColor(),
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                alignSelf: "center",
+                margin: "20px",
+                fontWeight: "bold",
+                fontSize: "40px",
+              }}
+            >
+              {data.title}
+            </Typography>
+            <MDBCarousel
+              showIndicators
+              showControls
+              fade
+              style={{
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                alignSelf: "center",
+                margin: "20px",
+                width: "70vw",
+                height: "400px",
+                borderRadius: "20px",
+                marginBottom: "40px",
+              }}
+            >
+              <MDBCarouselItem
+                itemId={1}
+                style={{
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  alignSelf: "center",
+                  margin: "20px",
+                  width: "70vw",
+                  height: "400px",
+                  borderRadius: "20px",
+                }}
+              >
+                <img
+                  src={data.image}
+                  className="d-block w-100"
+                  alt="..."
+                  style={{
+                    borderRadius: "20px",
+                  }}
+                />
+              </MDBCarouselItem>
+
+              <MDBCarouselItem
+                itemId={2}
+                style={{
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  alignSelf: "center",
+                  margin: "20px",
+                  width: "70vw",
+                  height: "400px",
+                  borderRadius: "20px",
+                }}
+              >
+                <img
+                  src={data.image1}
+                  className="d-block w-100"
+                  alt="..."
+                  style={{
+                    borderRadius: "20px",
+                  }}
+                />
+              </MDBCarouselItem>
+            </MDBCarousel>
+            <Rating
+              sx={{
+                alignSelf: "center",
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                margin: "20px",
+                width: "400px",
+                height: "80px",
+              }}
+              name="read-only"
+              value={data.rating}
+              readOnly
+            />
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "20px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              Ticket Price: Rs. {data.price}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "20px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              No Tickets Avaialable: {data.NoTickets}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "20px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              {data.description}
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "15px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              Email : {data.useremail}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "15px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              Phone : {data.usertel}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "15px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              Address : {data.Address}, {data.Address1}
+            </Typography>
+            <Iframe
+              id="myId"
+              src={data.location}
+              width="90%"
+              height="195vh"
+              styles={{
+                borderRadius: "20px",
+                justifyContent: "center",
+                alignSelf: "center",
+                alignItems: "center",
+                margin: "20px",
+              }}
+              allowfullscreen="true"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            />
+          </Box>
+        </div>
+      ) : (
+        <Typography
+          component="div"
+          style={{
+            margin: "10%",
+            justifyContent: "center",
+            alignItems: "center",
+            alignSelf: "center",
+            fontSize: "50px",
+            color: handleColor(),
+          }}
+        >
+          Sorry the page requested is not available!
+        </Typography>
+      )}
     </Box>
   );
 }
+
+export default ViewOneDestination;
