@@ -57,6 +57,26 @@ function App() {
               <Route path="/update" element={<UpdateDestination />} />
             </>
           )}
+          {loggedUser.role === "hotel" && (
+            <>
+              <Route path="/home" element={<Home />} />
+              <Route path="/viewall" element={<ViewAllDestination />} />
+              <Route path="/adminaccess/:pass" element={<Checkpassword />} />
+              <Route path="/addDestination" element={<AddDestination />} />
+              <Route path="/viewOne" element={<ViewOneDestination />} />
+              <Route path="/update" element={<UpdateDestination />} />
+            </>
+          )}
+          {loggedUser.role === "souvnier" && (
+            <>
+              <Route path="/home" element={<Home />} />
+              <Route path="/viewall" element={<ViewAllDestination />} />
+              <Route path="/adminaccess/:pass" element={<Checkpassword />} />
+              <Route path="/addDestination" element={<AddDestination />} />
+              <Route path="/viewOne" element={<ViewOneDestination />} />
+              <Route path="/update" element={<UpdateDestination />} />
+            </>
+          )}
         </Routes>
       </BrowserRouter>
     </div>
