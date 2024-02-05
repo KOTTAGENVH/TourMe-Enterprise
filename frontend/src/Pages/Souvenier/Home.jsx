@@ -184,7 +184,7 @@ export default function Dashboard() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Souvenier Management
           </Typography>
           <FormGroup
             sx={{

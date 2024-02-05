@@ -13,7 +13,6 @@ export const addSouvenier = async (
   Quatity,
   Address,
   Address1,
-  rating,
   username,
   useremail,
   usertel
@@ -68,13 +67,25 @@ export const getSouvenierById = async (id) => {
   }
 };
 
-//Delete Hotel By Id
-export const deleteHotelById = async (id) => {
+//Delete Souvenier By Id
+export const deleteSouvenierById = async (id) => {
   try {
-    const response = await apiClient.delete(`/hotel/delete-hotel/${id}`);
+    const response = await apiClient.delete(
+      `/souvenier/delete-souvenier/${id}`
+    );
     return response.data;
   } catch (error) {
     console.log(error);
+    return error;
+  }
+};
+
+//Get Souvenier by Email
+export const getSouvenierByEmail = async (email) => {
+  try {
+    const response = await apiClient.get(`/souvenier/get-souvenier-by-selleremail/${email}`);
+    return response.data;
+  } catch (error) {
     return error;
   }
 };

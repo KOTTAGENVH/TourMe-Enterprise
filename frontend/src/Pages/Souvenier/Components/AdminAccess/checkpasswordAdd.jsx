@@ -69,7 +69,7 @@ function Checkpassword() {
         toast.success("Admin Access Granted");
         setPassword("");
         if (pass === "add") {
-          navigate("/addDestination");
+          navigate("/add");
         }else if (pass === "update") {
           navigate("/update");
         }

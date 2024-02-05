@@ -1,5 +1,6 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled, createTheme } from "@mui/material/styles";
+import { useQuery } from "react-query";
 import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -22,7 +23,11 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { addDestination } from "../../Api/services/destinationService";
+import {
+  addDestination,
+  getDestinationById,
+  updateDestinationById,
+} from "../../Api/services/destinationService";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -46,24 +51,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { getSouvenierById } from "../../Api/services/souvenierService";
 
 const drawerWidth = 240;
 
@@ -111,27 +99,34 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
+export default function UpdateSouvenier() {
 
-export default function AddDestination() {
+
+  const { data, isLoading, error, isError } = useQuery({
+    queryFn: () => getSouvenierById(idState),
+  });
+
   const settings = ["Profile", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
   const [image2, setImage2] = React.useState(null);
-  const [googlemap, setGooglemap] = React.useState(null);
+  const [threedimage, setThreedimage] = React.useState(data?.description || "");
+  const [video, setVideo] = React.useState(null);
   const [openmodal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const [title, setTitle] = useState("");
-  const [maindescription, setMaindescription] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [NoTickets, setNoTickets] = useState("");
-  const [Address, setAddress] = useState("");
-  const [Address1, setAddress1] = useState("");
-  const [tel, setTel] = useState("");
+  const [title, setTitle] = useState(data?.title || "");
+  const [maindescription, setMaindescription] = useState(
+    data?.maindescription || ""
+  );
+  const [description, setDescription] = useState(data?.description || "");
+  const [price, setPrice] = useState(data?.price || "");
+  const [NoTickets, setNoTickets] = useState(data?.NoTickets || "");
+  const [Address, setAddress] = useState(data?.Address || "");
+  const [Address1, setAddress1] = useState(data?.Address1 || "");
+  const [tel, setTel] = useState(data?.usertel || "");
   const [titleerror, setTitleerror] = useState("");
   const [maindescriptionerror, setMaindescriptionerror] = useState("");
   const [descriptionerror, setDescriptionerror] = useState("");
@@ -152,6 +147,20 @@ export default function AddDestination() {
 
   const darkmode = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
+  const idState = useSelector((state) => state.id.id);
+
+  React.useEffect(() => {
+    if (data) {
+      setTitle(data.title || "");
+      setMaindescription(data.maindescription || "");
+      setDescription(data.description || "");
+      setPrice(data.price || "");
+      setNoTickets(data.NoTickets || "");
+      setAddress(data.Address || "");
+      setAddress1(data.Address1 || "");
+      setTel(data.usertel || "");
+    }
+  }, [data]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -224,30 +233,6 @@ export default function AddDestination() {
       .max(400, "Description must be at most 400 characters")
       .trim()
       .required("Description is required"),
-    image1: Yup.mixed()
-      .required("Image is required")
-      .test(
-        "fileSize",
-        "File size is too large. Maximum size is 5MB.",
-        (value) => value && value.size <= 5000000
-      )
-      .test(
-        "fileType",
-        "Unsupported file type. Please upload an image.",
-        (value) => value && ["image/jpeg", "image/png"].includes(value.type)
-      ),
-    image2: Yup.mixed()
-      .required("Image is required")
-      .test(
-        "fileSize",
-        "File size is too large. Maximum size is 5MB.",
-        (value) => value && value.size <= 5000000
-      )
-      .test(
-        "fileType",
-        "Unsupported file type. Please upload an image.",
-        (value) => value && ["image/jpeg", "image/png"].includes(value.type)
-      ),
     price: Yup.number()
       .required("Price is required")
       .positive("Price must be greater than 0"),
@@ -305,10 +290,7 @@ export default function AddDestination() {
     setAddress1error("");
   };
 
-  const handleGooglemapChange = (e) => {
-    setGooglemap(e.target.value);
-    setGooglemaperror("");
-  };
+
 
   const handleTelChange = (e) => {
     setTel(e);
@@ -325,13 +307,11 @@ export default function AddDestination() {
           title,
           maindescription,
           description,
-          image1,
-          image2,
           price,
           NoTickets,
           Address,
           Address1,
-          googlemap,
+
           tel,
         },
         { abortEarly: false }
@@ -339,6 +319,9 @@ export default function AddDestination() {
 
       let url1 = "";
       let url2 = "";
+
+      const finalUrl1 = url1 || data?.image || "";
+      const finalUrl2 = url2 || data?.image1 || "";
 
       if (image1 !== null && image2 !== null) {
         const storage1Ref = ref(storage, image1?.name);
@@ -351,32 +334,29 @@ export default function AddDestination() {
         url2 = await getDownloadURL(uploadTask2.ref);
       }
 
-      console.log("url1", url1);
-      console.log("url2", url2);
-
-      await addDestination(
+      await updateDestinationById(
+        idState,
         title,
         maindescription,
         description,
-        url1,
-        url2,
+        finalUrl1,
+        finalUrl2,
         price,
         NoTickets,
         Address,
         Address1,
-        googlemap,
         loggedUser?.username,
         loggedUser?.email,
         tel
       );
 
-      toast.success("Destination Added Successfully");
+      toast.success("Destination Updated Successfully");
       navigate("/home");
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log("Error Adding Destination", error);
-      toast.error("Error Adding Destination");
+      console.log("Error Updating Destination", error);
+      toast.error("Error Updating Destination");
 
       if (error.name === "ValidationError") {
         error.inner.forEach((e) => {
@@ -418,6 +398,7 @@ export default function AddDestination() {
       }
     }
   };
+
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <AppBar
@@ -582,7 +563,7 @@ export default function AddDestination() {
             textAlign="center"
             sx={{ color: handleColor() }}
           >
-            Add Destination
+            Update Destination
           </Typography>
           <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
             <Grid item xs={12} sm={6}>
@@ -591,7 +572,7 @@ export default function AddDestination() {
                 label="Destination Name"
                 variant="outlined"
                 fullWidth
-                value={title}
+                value={title || data?.title}
                 onChange={(e) => {
                   handleTitleChange(e);
                 }}
@@ -612,7 +593,7 @@ export default function AddDestination() {
                 label="Main Description (Only 100 Characters)"
                 variant="outlined"
                 fullWidth
-                value={maindescription}
+                value={maindescription || data?.maindescription}
                 onChange={(e) => {
                   handleMaindescriptionChange(e);
                 }}
@@ -637,7 +618,7 @@ export default function AddDestination() {
                 variant="outlined"
                 multiline
                 fullWidth
-                value={description}
+                value={description || data?.description}
                 onChange={(e) => {
                   handleDescriptionChange(e);
                 }}
@@ -704,7 +685,7 @@ export default function AddDestination() {
                 id="outlined-basic"
                 label="Price "
                 variant="outlined"
-                value={price}
+                value={price || data?.price}
                 onChange={(e) => {
                   handlePriceChange(e);
                 }}
@@ -729,7 +710,7 @@ export default function AddDestination() {
                 id="outlined-basic"
                 label="No of Tickets "
                 variant="outlined"
-                value={NoTickets}
+                value={NoTickets || data?.NoTickets}
                 onChange={(e) => {
                   handleNoTicketsChange(e);
                 }}
@@ -756,7 +737,7 @@ export default function AddDestination() {
                 id="outlined-basic-multiline"
                 label="Address 2(City, State, Country, Pincode)"
                 variant="outlined"
-                value={Address1}
+                value={Address1 || data?.Address1}
                 onChange={(e) => {
                   handleAddress1Change(e);
                 }}
@@ -779,7 +760,7 @@ export default function AddDestination() {
                 id="outlined-basic"
                 label="Address 1(House No, Street Name)"
                 variant="outlined"
-                value={Address}
+                value={Address || data?.Address}
                 onChange={(e) => {
                   handleAddressChange(e);
                 }}
@@ -803,29 +784,9 @@ export default function AddDestination() {
                   justifyContent: "space-evenly",
                 }}
               >
-                <TextField
-                  id="outlined-basic"
-                  label="Add Google Map Link (use embeded map)"
-                  variant="outlined"
-                  value={googlemap}
-                  helperText={googlemaperror}
-                  sx={{
-                    marginBottom: "2vh",
-                  }}
-                  onChange={(e) => {
-                    handleGooglemapChange(e);
-                  }}
-                  error={false}
-                  InputProps={{
-                    sx: {
-                      color: handleColor(),
-                      fontSize: "20px",
-                      borderRadius: "20px",
-                    },
-                  }}
-                />
+          
                 <MuiTelInput
-                  value={tel}
+                  value={tel || data?.usertel}
                   onChange={(e) => {
                     handleTelChange(e);
                   }}
@@ -853,18 +814,7 @@ export default function AddDestination() {
                 Check how to add google map
               </Button>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Iframe
-                id="myId"
-                src={googlemap}
-                width="350vw"
-                height="200vh"
-                styles={{ borderRadius: "20px" }}
-                allowfullscreen="true"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-              />
-            </Grid>
+  
             <Grid
               item
               xs={12}
@@ -893,7 +843,7 @@ export default function AddDestination() {
                   }}
                   onClick={handleSubmit}
                 >
-                  Add
+                  Update
                 </Button>
               )}
             </Grid>

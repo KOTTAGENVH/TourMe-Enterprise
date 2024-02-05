@@ -1,20 +1,22 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { useSelector } from "react-redux";
-import { deleteDestinationById } from "../../../Api/services/destinationService";
 import { toast, ToastContainer } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setidAction } from "../../../Redux/storeid/storeidAction";
 import { useNavigate } from "react-router-dom";
-function Destinationbox({
+import { deleteSouvenierById } from "../../../Api/services/souvenierService";
+function SouvenierBox({
   _id,
   title,
   maindescription,
   description,
   image,
   image1,
+  threedimage,
+  video,
   price,
-  NoTickets,
+  Quantity,
   Address,
   Address1,
   rating,
@@ -34,9 +36,8 @@ function Destinationbox({
 
   const handleDelete = async (id) => {
     try {
-      await deleteDestinationById(id).then((res) => {
+      await deleteSouvenierById(id).then((res) => {
         toast.success("Destination Deleted Successfully");
-        window.location.reload();
       });
     } catch (error) {
       toast.error("Error Deleting Destination");
@@ -87,7 +88,15 @@ function Destinationbox({
         >
           {title}
         </Typography>
-        <img src={image} alt="destination" />
+        <img 
+        style={{
+          width: "auto",
+          height: "250px",
+          borderRadius: "10px",
+          objectFit: "cover",
+          margin: "10px",
+        }}
+        src={image} alt="souvenier" />
         <Typography
           variant="body1"
           component="p"
@@ -156,4 +165,4 @@ function Destinationbox({
   );
 }
 
-export default Destinationbox;
+export default SouvenierBox;

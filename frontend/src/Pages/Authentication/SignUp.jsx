@@ -156,7 +156,7 @@ function SignUp() {
                     }}
                   >
                     <FormControlLabel
-                      value="souvenir"
+                      value="souvnier"
                       control={<Radio />}
                       label="Souvenir Shop"
                     />
@@ -169,11 +169,6 @@ function SignUp() {
                       value="destination"
                       control={<Radio />}
                       label="Destination"
-                    />
-                    <FormControlLabel
-                      value="customer"
-                      control={<Radio />}
-                      label="Customer"
                     />
                   </RadioGroup>
                   {formik.touched.role && formik.errors.role && (

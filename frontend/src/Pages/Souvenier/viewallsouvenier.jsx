@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, createTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -12,7 +12,6 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import { useSelector } from "react-redux";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { ToastContainer } from "react-toastify";
@@ -30,28 +29,10 @@ import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
 import { useNavigate } from "react-router-dom";
-import { getDestinationByEmail } from "../../Api/services/destinationService";
-import Destinationbox from "./Components/destinationbox";
+import SouvenierBox from "./Components/souvenierbox";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { getSouvenierByEmail } from "../../Api/services/souvenierService";
 
 const drawerWidth = 240;
 
@@ -99,9 +80,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
-function ViewAllDestination() {
+function ViewAllSouvenier() {
   const settings = ["Profile", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -173,13 +152,13 @@ function ViewAllDestination() {
   };
 
   const { data, isLoading, error, isError } = useQuery({
-    queryFn: () => getDestinationByEmail(loggedUser?.email),
+    queryFn: () => getSouvenierByEmail(loggedUser?.email),
   });
 
   // Filtering destinations based on the search text
-  const filteredDestinations = data?.destinations?.filter((destination) =>
-    destination.title.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredSouveniers = data?.length ? data.filter((souvenier) =>
+  souvenier.title.toLowerCase().includes(searchText.toLowerCase())
+) : [];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -217,7 +196,7 @@ function ViewAllDestination() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Souvenier Management
           </Typography>
           <FormGroup
             sx={{
@@ -338,7 +317,7 @@ function ViewAllDestination() {
             onChange={handleInputChange}
             sx={{
               marginTop: "80px",
-              marginLeft: "80%",
+              marginLeft: "50%",
               width: "30vw",
               height: "50px",
               backgroundColor: "rgba(255, 255, 255, 0.3)",
@@ -371,23 +350,25 @@ function ViewAllDestination() {
               marginLeft: "30px",
             }}
           >
-            {filteredDestinations?.map((destination) => (
-              <Destinationbox
-                _id={destination._id}
-                title={destination.title}
-                maindescription={destination.maindescription}
-                description={destination.description}
-                image={destination.image}
-                image1={destination.image1}
-                price={destination.price}
-                NoTickets={destination.NoTickets}
-                Address={destination.Address}
-                Address1={destination.Address1}
-                rating={destination.rating}
-                location={destination.location}
-                username={destination.username}
-                useremail={destination.useremail}
-                usertel={destination.usertel}
+            {filteredSouveniers?.map((souvenier) => (
+              <SouvenierBox
+                _id={souvenier._id}
+                title={souvenier.title}
+                maindescription={souvenier.maindescription}
+                description={souvenier.description}
+                image={souvenier.image}
+                image1={souvenier.image1}
+                threedimage={souvenier.threedimage}
+                video={souvenier.video}
+                price={souvenier.price}
+                Quatity={souvenier.Quatity}
+                Address={souvenier.Address}
+                Address1={souvenier.Address1}
+                rating={souvenier.rating}
+                location={souvenier.location}
+                username={souvenier.username}
+                useremail={souvenier.useremail}
+                usertel={souvenier.usertel}
               />
             ))}
           </div>
@@ -409,11 +390,11 @@ function ViewAllDestination() {
             width: "100%",
           }}
         >
-          Sorry No Destinations Available!
+          Sorry No Souveniers Available!
         </Typography>
       )}
     </Box>
   );
 }
 
-export default ViewAllDestination;
+export default ViewAllSouvenier;

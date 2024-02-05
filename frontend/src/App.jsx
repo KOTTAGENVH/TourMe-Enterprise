@@ -3,6 +3,8 @@ import SignUp from "./Pages/Authentication/SignUp";
 import SignIn from "./Pages/Authentication/SignIn";
 import ForgetPassword from "./Pages/Authentication/ForgetPassword";
 import Home from "./Pages/Destination/Home";
+import SouvenierHome from "./Pages/Souvenier/Home";
+import HotelHome from "./Pages/Hotel/Home";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -15,6 +17,9 @@ import ViewOneDestination from "./Pages/Destination/viewOneDestination";
 import "swiper/css";
 import "swiper/css/pagination";
 import UpdateDestination from "./Pages/Destination/updateDestination";
+import AddSouvenier from "./Pages/Souvenier/addsouvenier";
+import ViewAllSouvenier from "./Pages/Souvenier/viewallsouvenier";
+import ViewOneSouvenier from "./Pages/Souvenier/viewonesouvenier";
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const darkmode = useSelector((state) => state.darkmode.darkmode);
@@ -52,28 +57,28 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/viewall" element={<ViewAllDestination />} />
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addDestination" element={<AddDestination />} />
+              <Route path="/addItem" element={<AddDestination />} />
               <Route path="/viewOne" element={<ViewOneDestination />} />
               <Route path="/update" element={<UpdateDestination />} />
             </>
           )}
           {loggedUser.role === "hotel" && (
             <>
-              <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<HotelHome />} />
               <Route path="/viewall" element={<ViewAllDestination />} />
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addDestination" element={<AddDestination />} />
+              <Route path="/add" element={<AddDestination />} />
               <Route path="/viewOne" element={<ViewOneDestination />} />
               <Route path="/update" element={<UpdateDestination />} />
             </>
           )}
           {loggedUser.role === "souvnier" && (
             <>
-              <Route path="/home" element={<Home />} />
-              <Route path="/viewall" element={<ViewAllDestination />} />
+              <Route path="/home" element={<SouvenierHome />} />
+              <Route path="/viewall" element={<ViewAllSouvenier />} />
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addDestination" element={<AddDestination />} />
-              <Route path="/viewOne" element={<ViewOneDestination />} />
+              <Route path="/addItem" element={<AddSouvenier />} />
+              <Route path="/viewOne" element={<ViewOneSouvenier />} />
               <Route path="/update" element={<UpdateDestination />} />
             </>
           )}
