@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -22,7 +22,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { addDestination } from "../../Api/services/destinationService";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -46,24 +45,8 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { addSouvenier } from "../../Api/services/souvenierService";
+import { addHotel } from "../../Api/services/hotelService";
 
 const drawerWidth = 240;
 
@@ -111,9 +94,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
-export default function AddDestination() {
+export default function AddHotel() {
   const settings = ["Profile", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -125,10 +106,12 @@ export default function AddDestination() {
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [VirtualVideo, setVirtualVideo] = useState("");
   const [maindescription, setMaindescription] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [NoTickets, setNoTickets] = useState("");
+  const [NoRooms, setNoRooms] = useState("");
   const [Address, setAddress] = useState("");
   const [Address1, setAddress1] = useState("");
   const [tel, setTel] = useState("");
@@ -136,7 +119,9 @@ export default function AddDestination() {
   const [maindescriptionerror, setMaindescriptionerror] = useState("");
   const [descriptionerror, setDescriptionerror] = useState("");
   const [priceerror, setPriceerror] = useState("");
-  const [NoTicketserror, setNoTicketserror] = useState("");
+  const [VirtualVideoerror, setVirtualVideoerror] = useState("");
+  const [noroomserror, setNoRoomserror] = useState("");
+  const [categoryerror, setCategoryerror] = useState("");
   const [Addresserror, setAddresserror] = useState("");
   const [Address1error, setAddress1error] = useState("");
   const [image1error, setImage1error] = useState("");
@@ -216,6 +201,7 @@ export default function AddDestination() {
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().trim().required("Destination Name is required"),
+    category: Yup.string().trim().required("Category is required"),
     maindescription: Yup.string()
       .max(100, "Main Description must be at most 100 characters")
       .trim()
@@ -251,9 +237,10 @@ export default function AddDestination() {
     price: Yup.number()
       .required("Price is required")
       .positive("Price must be greater than 0"),
-    NoTickets: Yup.number()
+    NoRooms: Yup.number()
       .required("Number of Tickets is required")
       .integer("Number of Tickets must be an integer"),
+    VirtualVideo: Yup.string().trim().required("Virtual Video is required"),
     Address: Yup.string().trim().required("Address is required"),
     Address1: Yup.string().trim().required("Address is required"),
     googlemap: Yup.string().trim().required("Location is required"),
@@ -290,9 +277,19 @@ export default function AddDestination() {
     setPriceerror("");
   };
 
-  const handleNoTicketsChange = (e) => {
-    setNoTickets(e.target.value);
-    setNoTicketserror("");
+  const handleNoRoomsChange = (e) => {
+    setNoRooms(e.target.value);
+    setNoRoomserror("");
+  };
+
+  const handleVirtualVideoChange = (e) => {
+    setVirtualVideo(e.target.value);
+    setVirtualVideoerror("");
+  };
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+    setCategoryerror("");
   };
 
   const handleAddressChange = (e) => {
@@ -323,12 +320,14 @@ export default function AddDestination() {
       await validationSchema.validate(
         {
           title,
+          category,
           maindescription,
           description,
           image1,
           image2,
+          VirtualVideo,
           price,
-          NoTickets,
+          NoRooms,
           Address,
           Address1,
           googlemap,
@@ -351,17 +350,17 @@ export default function AddDestination() {
         url2 = await getDownloadURL(uploadTask2.ref);
       }
 
-      console.log("url1", url1);
-      console.log("url2", url2);
 
-      await addDestination(
+      await addHotel(
         title,
+        category,
         maindescription,
         description,
         url1,
         url2,
+        VirtualVideo,
         price,
-        NoTickets,
+        NoRooms,
         Address,
         Address1,
         googlemap,
@@ -384,6 +383,9 @@ export default function AddDestination() {
             case "title":
               setTitleerror(e.message);
               break;
+            case "category":
+              setCategoryerror(e.message);
+              break;
             case "maindescription":
               setMaindescriptionerror(e.message);
               break;
@@ -396,11 +398,14 @@ export default function AddDestination() {
             case "image2":
               setImage2error(e.message);
               break;
+            case "VirtualVideo":
+              setVirtualVideoerror(e.message);
+              break;
             case "price":
               setPriceerror(e.message);
               break;
-            case "NoTickets":
-              setNoTicketserror(e.message);
+            case "NoRooms":
+              setNoRoomserror(e.message);
               break;
             case "Address":
               setAddresserror(e.message);
@@ -431,7 +436,7 @@ export default function AddDestination() {
       >
         <Toolbar
           sx={{
-            pr: "24px", // keep right padding when drawer closed
+            pr: "24px",
           }}
         >
           <IconButton
@@ -453,7 +458,7 @@ export default function AddDestination() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Hotel Management
           </Typography>
           <FormGroup
             sx={{
@@ -582,13 +587,13 @@ export default function AddDestination() {
             textAlign="center"
             sx={{ color: handleColor() }}
           >
-            Add Destination
+            Add Hotel
           </Typography>
-          <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
+          <Grid container spacing={2} sx={{ marginTop: "1vh" }}>
             <Grid item xs={12} sm={6}>
               <TextField
                 id="outlined-basic"
-                label="Destination Name"
+                label="Hotel Name"
                 variant="outlined"
                 fullWidth
                 value={title}
@@ -596,6 +601,28 @@ export default function AddDestination() {
                   handleTitleChange(e);
                 }}
                 helperText={titleerror}
+                error={false}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Category"
+                variant="outlined"
+                fullWidth
+                value={category}
+                sx={{
+                  marginTop: "2vh",
+                }}
+                onChange={(e) => {
+                  handleCategoryChange(e);
+                }}
+                helperText={categoryerror}
                 error={false}
                 InputProps={{
                   sx: {
@@ -690,6 +717,27 @@ export default function AddDestination() {
                   endAdornment: <AttachFileIcon />,
                 }}
               />
+              <TextField
+                id="outlined-multiline-static"
+                label="Virtual Video Link"
+                variant="outlined"
+                fullWidth
+                value={VirtualVideo}
+                onChange={(e) => {
+                  handleVirtualVideoChange(e);
+                }}
+                helperText={VirtualVideoerror}
+                inputProps={{
+                  maxLength: 400,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
             </Grid>
             <Grid
               item
@@ -727,14 +775,14 @@ export default function AddDestination() {
 
               <TextField
                 id="outlined-basic"
-                label="No of Tickets "
+                label="No of Rooms "
                 variant="outlined"
-                value={NoTickets}
+                value={NoRooms}
                 onChange={(e) => {
-                  handleNoTicketsChange(e);
+                  handleNoRoomsChange(e);
                 }}
                 error={false}
-                helperText={NoTicketserror}
+                helperText={noroomserror}
                 sx={{ marginLeft: "1vw", width: "15vw" }}
                 inputProps={{
                   maxLength: 400,
@@ -858,7 +906,7 @@ export default function AddDestination() {
                 id="myId"
                 src={googlemap}
                 width="350vw"
-                height="200vh"
+                height="100vh"
                 styles={{ borderRadius: "20px" }}
                 allowfullscreen="true"
                 loading="lazy"
@@ -881,7 +929,7 @@ export default function AddDestination() {
                 <Button
                   variant="contained"
                   sx={{
-                    marginTop: "4vh",
+                    marginTop: "2vh",
                     width: "10vw",
                     height: "5vh",
                     marginLeft: "auto",
@@ -890,6 +938,7 @@ export default function AddDestination() {
                     alignItems: "center",
                     backgroundColor: "black",
                     color: "white",
+                    borderRadius: "20px",
                   }}
                   onClick={handleSubmit}
                 >

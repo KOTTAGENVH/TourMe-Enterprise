@@ -104,12 +104,12 @@ export const updateSouvenierById = async (
   Quatity,
   Address,
   Address1,
-  rating,
   username,
   useremail,
   usertel
 ) => {
   try {
+    const rating = 0;
     const response = await apiClient.patch(
       `/souvenier/update-souvenier/${id}`,
       {

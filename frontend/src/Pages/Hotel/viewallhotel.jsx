@@ -36,24 +36,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { getAllHotelsbyemail } from "../../Api/services/hotelService";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
@@ -100,9 +82,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
-function ViewAllDestination() {
+function ViewAllHotels() {
   const settings = ["Profile", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -115,7 +95,6 @@ function ViewAllDestination() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -178,9 +157,12 @@ function ViewAllDestination() {
   });
 
   // Filtering destinations based on the search text
-  const filteredDestinations = data?.destinations?.filter((destination) =>
-    destination.title.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredDestinations = data?.length > 0 ? data.filter(
+    (hotel) =>
+      hotel.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      hotel.category.toLowerCase().includes(searchText.toLowerCase())
+  ) : [];
+
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -218,7 +200,7 @@ function ViewAllDestination() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Hotel Management
           </Typography>
           <FormGroup
             sx={{
@@ -339,7 +321,7 @@ function ViewAllDestination() {
             onChange={handleInputChange}
             sx={{
               marginTop: "80px",
-              marginLeft: "80%",
+              marginLeft: "50%",
               width: "30vw",
               height: "50px",
               backgroundColor: "rgba(255, 255, 255, 0.3)",
@@ -412,11 +394,11 @@ function ViewAllDestination() {
             width: "100%",
           }}
         >
-          Sorry No Destinations Available!
+          Sorry No Hotels Available!
         </Typography>
       )}
     </Box>
   );
 }
 
-export default ViewAllDestination;
+export default ViewAllHotels;

@@ -13,7 +13,6 @@ export const addHotel = async (
   NoRooms,
   Address,
   Address1,
-  rating,
   location,
   username,
   useremail,
@@ -106,13 +105,13 @@ export const updateHotelById = async (
   NoRooms,
   Address,
   Address1,
-  rating,
   location,
   username,
   useremail,
   usertel
 ) => {
   try {
+    const rating = 0;
     const response = await apiClient.patch(`/hotel/update-hotel/${id}`, {
       title,
       category,

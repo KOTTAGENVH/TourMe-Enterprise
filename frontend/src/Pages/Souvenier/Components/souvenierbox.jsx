@@ -38,6 +38,7 @@ function SouvenierBox({
     try {
       await deleteSouvenierById(id).then((res) => {
         toast.success("Destination Deleted Successfully");
+        window.location.reload();
       });
     } catch (error) {
       toast.error("Error Deleting Destination");

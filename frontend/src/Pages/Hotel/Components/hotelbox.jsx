@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { useSelector } from "react-redux";
-import { deleteDestinationById } from "../../../Api/services/destinationService";
 import { toast, ToastContainer } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setidAction } from "../../../Redux/storeid/storeidAction";
 import { useNavigate } from "react-router-dom";
+import { deleteHotelById } from "../../../Api/services/hotelService";
 function Hotelbox({
   _id,
   title,
@@ -34,12 +34,12 @@ function Hotelbox({
 
   const handleDelete = async (id) => {
     try {
-      await deleteDestinationById(id).then((res) => {
-        toast.success("Destination Deleted Successfully");
+      await deleteHotelById(id).then((res) => {
+        toast.success("Hotel Deleted Successfully");
         window.location.reload();
       });
     } catch (error) {
-      toast.error("Error Deleting Destination");
+      toast.error("Error Deleting Hotel");
     }
   };
 

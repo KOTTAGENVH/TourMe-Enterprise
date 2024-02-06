@@ -20,6 +20,11 @@ import UpdateDestination from "./Pages/Destination/updateDestination";
 import AddSouvenier from "./Pages/Souvenier/addsouvenier";
 import ViewAllSouvenier from "./Pages/Souvenier/viewallsouvenier";
 import ViewOneSouvenier from "./Pages/Souvenier/viewonesouvenier";
+import UpdateSouvenier from "./Pages/Souvenier/updatesouvenier";
+import AddHotel from "./Pages/Hotel/AddHotel";
+import ViewAllHotels from "./Pages/Hotel/viewallhotel";
+import UpdateHotel from "./Pages/Hotel/updatehotel";
+import ViewOneHotel from "./Pages/Hotel/viewonehotel";
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const darkmode = useSelector((state) => state.darkmode.darkmode);
@@ -65,11 +70,11 @@ function App() {
           {loggedUser.role === "hotel" && (
             <>
               <Route path="/home" element={<HotelHome />} />
-              <Route path="/viewall" element={<ViewAllDestination />} />
+              <Route path="/viewall" element={<ViewAllHotels />} />
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/add" element={<AddDestination />} />
-              <Route path="/viewOne" element={<ViewOneDestination />} />
-              <Route path="/update" element={<UpdateDestination />} />
+              <Route path="/addItem" element={<AddHotel />} />
+              <Route path="/viewOne" element={<ViewOneHotel />} />
+              <Route path="/update" element={<UpdateHotel />} />
             </>
           )}
           {loggedUser.role === "souvnier" && (
@@ -79,7 +84,7 @@ function App() {
               <Route path="/adminaccess/:pass" element={<Checkpassword />} />
               <Route path="/addItem" element={<AddSouvenier />} />
               <Route path="/viewOne" element={<ViewOneSouvenier />} />
-              <Route path="/update" element={<UpdateDestination />} />
+              <Route path="/update" element={<UpdateSouvenier />} />
             </>
           )}
         </Routes>

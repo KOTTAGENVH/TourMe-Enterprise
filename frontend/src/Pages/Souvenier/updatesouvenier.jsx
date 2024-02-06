@@ -23,11 +23,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import {
-  addDestination,
-  getDestinationById,
-  updateDestinationById,
-} from "../../Api/services/destinationService";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -42,16 +37,11 @@ import { useNavigate } from "react-router-dom";
 import { MuiTelInput } from "mui-tel-input";
 import TextField from "@mui/material/TextField";
 import { ToastContainer, toast } from "react-toastify";
-import Iframe from "react-iframe";
-import GoogleMapImage1 from "../../Resources/GoogleMap1.png";
-import GoogleMapImage2 from "../../Resources/GoogleMap2.png";
-import GoogleMapImage3 from "../../Resources/GoogleMap3.png";
-import GoogleMapImage4 from "../../Resources/GoogleMap4.png";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-import { getSouvenierById } from "../../Api/services/souvenierService";
+import { getSouvenierById, updateSouvenierById } from "../../Api/services/souvenierService";
 
 const drawerWidth = 240;
 
@@ -100,8 +90,6 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function UpdateSouvenier() {
-
-
   const { data, isLoading, error, isError } = useQuery({
     queryFn: () => getSouvenierById(idState),
   });
@@ -112,7 +100,6 @@ export default function UpdateSouvenier() {
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
   const [image2, setImage2] = React.useState(null);
-  const [threedimage, setThreedimage] = React.useState(data?.description || "");
   const [video, setVideo] = React.useState(null);
   const [openmodal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -123,21 +110,23 @@ export default function UpdateSouvenier() {
   );
   const [description, setDescription] = useState(data?.description || "");
   const [price, setPrice] = useState(data?.price || "");
-  const [NoTickets, setNoTickets] = useState(data?.NoTickets || "");
+  const [quantity, setQuantity] = useState(data?.NoTickets || "");
   const [Address, setAddress] = useState(data?.Address || "");
   const [Address1, setAddress1] = useState(data?.Address1 || "");
   const [tel, setTel] = useState(data?.usertel || "");
   const [titleerror, setTitleerror] = useState("");
   const [maindescriptionerror, setMaindescriptionerror] = useState("");
+  const [threedimage, setThreedimage] = useState(data?.description || "");
   const [descriptionerror, setDescriptionerror] = useState("");
   const [priceerror, setPriceerror] = useState("");
-  const [NoTicketserror, setNoTicketserror] = useState("");
+  const [Quantityerror, setQuantityerror] = useState("");
   const [Addresserror, setAddresserror] = useState("");
   const [Address1error, setAddress1error] = useState("");
   const [image1error, setImage1error] = useState("");
   const [image2error, setImage2error] = useState("");
-  const [googlemaperror, setGooglemaperror] = useState("");
+  const [videoerror, setVideoerror] = useState("");
   const [telerror, setTelerror] = useState("");
+  const [threedimageerror, setThreedimageerror] = useState("");
 
   const handleOpen = () => setOpenModal(true);
   const handleClose = () => setOpenModal(false);
@@ -149,16 +138,18 @@ export default function UpdateSouvenier() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const idState = useSelector((state) => state.id.id);
 
+
   React.useEffect(() => {
     if (data) {
       setTitle(data.title || "");
       setMaindescription(data.maindescription || "");
       setDescription(data.description || "");
       setPrice(data.price || "");
-      setNoTickets(data.NoTickets || "");
+      setQuantity(data?.Quatity || "");
       setAddress(data.Address || "");
       setAddress1(data.Address1 || "");
       setTel(data.usertel || "");
+      setThreedimage(data.threedimage || "");
     }
   }, [data]);
 
@@ -236,13 +227,13 @@ export default function UpdateSouvenier() {
     price: Yup.number()
       .required("Price is required")
       .positive("Price must be greater than 0"),
-    NoTickets: Yup.number()
-      .required("Number of Tickets is required")
-      .integer("Number of Tickets must be an integer"),
+    quantity: Yup.number()
+      .required("Quantity is required")
+      .integer("Quantity must be an integer"),
     Address: Yup.string().trim().required("Address is required"),
     Address1: Yup.string().trim().required("Address is required"),
-    googlemap: Yup.string().trim().required("Location is required"),
     tel: Yup.string().trim().required("Telephone is required"),
+    threedimage: Yup.string().trim().required("3D Image is required"),
   });
 
   const handleTitleChange = (e) => {
@@ -270,14 +261,24 @@ export default function UpdateSouvenier() {
     setImage2error("");
   };
 
+  const handleVideoChange = (e) => {
+    setVideo(e);
+    setVideoerror("");
+  };
+
+  const handleThreedimageChange = (e) => {
+    setThreedimage(e.target.value);
+    setThreedimageerror("");
+  };
+
   const handlePriceChange = (e) => {
     setPrice(e.target.value);
     setPriceerror("");
   };
 
-  const handleNoTicketsChange = (e) => {
-    setNoTickets(e.target.value);
-    setNoTicketserror("");
+  const handleQuantityChange = (e) => {
+    setQuantity(e.target.value);
+    setQuantityerror("");
   };
 
   const handleAddressChange = (e) => {
@@ -289,8 +290,6 @@ export default function UpdateSouvenier() {
     setAddress1(e.target.value);
     setAddress1error("");
   };
-
-
 
   const handleTelChange = (e) => {
     setTel(e);
@@ -308,10 +307,10 @@ export default function UpdateSouvenier() {
           maindescription,
           description,
           price,
-          NoTickets,
+          quantity,
           Address,
           Address1,
-
+          threedimage,
           tel,
         },
         { abortEarly: false }
@@ -319,30 +318,38 @@ export default function UpdateSouvenier() {
 
       let url1 = "";
       let url2 = "";
+      let url3 = "";
 
       const finalUrl1 = url1 || data?.image || "";
       const finalUrl2 = url2 || data?.image1 || "";
+      const finalUrl3 = url3 || data?.video || "";
 
-      if (image1 !== null && image2 !== null) {
+      if (image1 !== null && image2 !== null && video !== null) {
         const storage1Ref = ref(storage, image1?.name);
         const storage2Ref = ref(storage, image2?.name);
+        const storage3Ref = ref(storage, video?.name);
 
         const uploadTask1 = await uploadBytes(storage1Ref, image1);
         url1 = await getDownloadURL(uploadTask1.ref);
 
         const uploadTask2 = await uploadBytes(storage2Ref, image2);
         url2 = await getDownloadURL(uploadTask2.ref);
+
+        const uploadTask3 = await uploadBytes(storage3Ref, video);
+        url3 = await getDownloadURL(uploadTask3.ref);
       }
 
-      await updateDestinationById(
+      await updateSouvenierById(
         idState,
         title,
         maindescription,
         description,
         finalUrl1,
         finalUrl2,
+        threedimage,
+        finalUrl3,
         price,
-        NoTickets,
+        quantity,
         Address,
         Address1,
         loggedUser?.username,
@@ -355,7 +362,6 @@ export default function UpdateSouvenier() {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log("Error Updating Destination", error);
       toast.error("Error Updating Destination");
 
       if (error.name === "ValidationError") {
@@ -376,11 +382,17 @@ export default function UpdateSouvenier() {
             case "image2":
               setImage2error(e.message);
               break;
+            case "video":
+              setVideoerror(e.message);
+              break;
+            case "threedimage":
+              setThreedimageerror(e.message);
+              break;
             case "price":
               setPriceerror(e.message);
               break;
-            case "NoTickets":
-              setNoTicketserror(e.message);
+            case "quantity":
+              setQuantityerror(e.message);
               break;
             case "Address":
               setAddresserror(e.message);
@@ -388,8 +400,8 @@ export default function UpdateSouvenier() {
             case "Address1":
               setAddress1error(e.message);
               break;
-            case "googlemap":
-              setGooglemaperror(e.message);
+            case "tel":
+              setTelerror(e.message);
               break;
             default:
               break;
@@ -434,7 +446,7 @@ export default function UpdateSouvenier() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Souvenier Management
           </Typography>
           <FormGroup
             sx={{
@@ -563,9 +575,9 @@ export default function UpdateSouvenier() {
             textAlign="center"
             sx={{ color: handleColor() }}
           >
-            Update Destination
+            Update Souvenier
           </Typography>
-          <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
+          <Grid container spacing={2} sx={{ marginTop: "1vh" }}>
             <Grid item xs={12} sm={6}>
               <TextField
                 id="outlined-basic"
@@ -671,6 +683,42 @@ export default function UpdateSouvenier() {
                   endAdornment: <AttachFileIcon />,
                 }}
               />
+              <MuiFileInput
+                sx={{ height: "8vh" }}
+                fullWidth
+                error={false}
+                label="Upload your video"
+                value={video}
+                helperText={videoerror}
+                onChange={(e) => {
+                  handleVideoChange(e);
+                }}
+                InputProps={{
+                  inputProps: {
+                    accept: "video/*",
+                  },
+                  endAdornment: <AttachFileIcon />,
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Add 3D image url"
+                variant="outlined"
+                fullWidth
+                value={threedimage || data?.threedimage}
+                onChange={(e) => {
+                  handleThreedimageChange(e);
+                }}
+                helperText={threedimageerror}
+                error={false}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
             </Grid>
             <Grid
               item
@@ -708,14 +756,14 @@ export default function UpdateSouvenier() {
 
               <TextField
                 id="outlined-basic"
-                label="No of Tickets "
+                label="Quantity "
                 variant="outlined"
-                value={NoTickets || data?.NoTickets}
+                value={quantity }
                 onChange={(e) => {
-                  handleNoTicketsChange(e);
+                  handleQuantityChange(e);
                 }}
                 error={false}
-                helperText={NoTicketserror}
+                helperText={Quantityerror}
                 sx={{ marginLeft: "1vw", width: "15vw" }}
                 inputProps={{
                   maxLength: 400,
@@ -776,45 +824,21 @@ export default function UpdateSouvenier() {
                 }}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
-              <div
+              <MuiTelInput
+                fullWidth
+                value={tel}
+                onChange={(e) => {
+                  handleTelChange(e);
+                }}
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-evenly",
+                  color: handleColor(),
                 }}
-              >
-          
-                <MuiTelInput
-                  value={tel || data?.usertel}
-                  onChange={(e) => {
-                    handleTelChange(e);
-                  }}
-                  style={{
-                    color: handleColor(),
-                  }}
-                  label="Telephone"
-                />
-              </div>
-              <Button
-                variant="contained"
-                sx={{
-                  width: "17vw",
-                  height: "3vh",
-                  marginLeft: "10vw",
-                  marginRight: "auto",
-                  justifyContent: "right",
-                  alignItems: "right",
-                  backgroundColor: "black",
-                  color: "white",
-                  borderRadius: "20px",
-                }}
-                onClick={() => handleOpen()}
-              >
-                Check how to add google map
-              </Button>
+                label="Telephone"
+              />
             </Grid>
-  
+
             <Grid
               item
               xs={12}
@@ -826,7 +850,21 @@ export default function UpdateSouvenier() {
               }}
             >
               {loading ? (
-                <CircularProgress variant="determinate" value={progress} />
+                <CircularProgress
+                  sx={{
+                    marginTop: "4vh",
+                    width: "10vw",
+                    height: "5vh",
+                    marginLeft: "50vw",
+                    marginRight: "auto",
+                    justifyContent: "center",
+                    alignItems: "right",
+                    justifySelf: "right",
+                    alignSelf: "right",
+                  }}
+                  variant="determinate"
+                  value={progress}
+                />
               ) : (
                 <Button
                   variant="contained"
@@ -834,10 +872,12 @@ export default function UpdateSouvenier() {
                     marginTop: "4vh",
                     width: "10vw",
                     height: "5vh",
-                    marginLeft: "auto",
+                    marginLeft: "50vw",
                     marginRight: "auto",
                     justifyContent: "center",
-                    alignItems: "center",
+                    alignItems: "right",
+                    justifySelf: "right",
+                    alignSelf: "right",
                     backgroundColor: "black",
                     color: "white",
                   }}
@@ -850,117 +890,6 @@ export default function UpdateSouvenier() {
           </Grid>
         </div>
       </Box>
-      <Modal
-        open={openmodal}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 900,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Carousel>
-            <Typography variant="h5" textAlign="center">
-              Step 1 : Follow this link{" "}
-              <Link
-                href="https://www.embed-map.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://www.embed-map.com
-              </Link>
-            </Typography>
-            <div>
-              <Typography variant="h6" textAlign="center">
-                Step 2 : Enter Location{" "}
-                <Link
-                  href="https://www.embed-map.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://www.embed-map.com
-                </Link>
-              </Typography>
-              <img
-                src={GoogleMapImage1}
-                alt="2"
-                border="0"
-                width="100%"
-                height="100%"
-              />
-            </div>
-
-            <div>
-              <Typography variant="h6" textAlign="center">
-                Step 3 : Enter Click Generate HTML code{" "}
-                <Link
-                  href="https://www.embed-map.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://www.embed-map.com
-                </Link>
-              </Typography>
-              <img
-                src={GoogleMapImage2}
-                alt="2"
-                border="0"
-                width="100%"
-                height="100%"
-              />
-            </div>
-            <div>
-              <Typography variant="h6" textAlign="center">
-                Step 4 : Copy only url inside the iframe tag near src{" "}
-                <Link
-                  href="https://www.embed-map.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://www.embed-map.com
-                </Link>
-              </Typography>
-              <img
-                src={GoogleMapImage3}
-                alt="2"
-                border="0"
-                width="100%"
-                height="100%"
-              />
-            </div>
-            <div>
-              <Typography variant="h6" textAlign="center">
-                Step 5 :Paste in the textfield and check if the map would appear
-                in a small window to the left{" "}
-                <Link
-                  href="https://www.embed-map.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://www.embed-map.com
-                </Link>
-              </Typography>
-              <img
-                src={GoogleMapImage4}
-                alt="2"
-                border="0"
-                width="100%"
-                height="100%"
-              />
-            </div>
-          </Carousel>
-        </Box>
-      </Modal>
     </Box>
   );
 }

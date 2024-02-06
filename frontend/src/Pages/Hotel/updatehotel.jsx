@@ -23,11 +23,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import {
-  addDestination,
-  getDestinationById,
-  updateDestinationById,
-} from "../../Api/services/destinationService";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -51,24 +46,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { getHotelById, updateHotelById } from "../../Api/services/hotelService";
 
 const drawerWidth = 240;
 
@@ -116,11 +94,9 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
-export default function UpdateDestination() {
+export default function UpdateHotel() {
   const { data, isLoading, error, isError } = useQuery({
-    queryFn: () => getDestinationById(idState),
+    queryFn: () => getHotelById(idState),
   });
 
   const settings = ["Profile", "Logout"];
@@ -129,29 +105,35 @@ export default function UpdateDestination() {
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
   const [image2, setImage2] = React.useState(null);
+  const [virtualVideo, setVirtualVideo] = React.useState(
+    data?.VirtualVideo || ""
+  );
   const [googlemap, setGooglemap] = React.useState(data?.location || "");
   const [openmodal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [title, setTitle] = useState(data?.title || "");
+  const [category, setCategory] = useState(data?.category || "");
   const [maindescription, setMaindescription] = useState(
     data?.maindescription || ""
   );
   const [description, setDescription] = useState(data?.description || "");
   const [price, setPrice] = useState(data?.price || "");
-  const [NoTickets, setNoTickets] = useState(data?.NoTickets || "");
+  const [NoRooms, setNoRooms] = useState(data?.NoRooms || "");
   const [Address, setAddress] = useState(data?.Address || "");
   const [Address1, setAddress1] = useState(data?.Address1 || "");
   const [tel, setTel] = useState(data?.usertel || "");
   const [titleerror, setTitleerror] = useState("");
+  const [categoryerror, setCategoryerror] = useState("");
   const [maindescriptionerror, setMaindescriptionerror] = useState("");
   const [descriptionerror, setDescriptionerror] = useState("");
   const [priceerror, setPriceerror] = useState("");
-  const [NoTicketserror, setNoTicketserror] = useState("");
+  const [NoRoomserror, setNoRoomserror] = useState("");
   const [Addresserror, setAddresserror] = useState("");
   const [Address1error, setAddress1error] = useState("");
   const [image1error, setImage1error] = useState("");
   const [image2error, setImage2error] = useState("");
+  const [virtualVideoerror, setVirtualVideoerror] = useState("");
   const [googlemaperror, setGooglemaperror] = useState("");
   const [telerror, setTelerror] = useState("");
 
@@ -168,14 +150,16 @@ export default function UpdateDestination() {
   React.useEffect(() => {
     if (data) {
       setTitle(data.title || "");
+      setCategory(data.category || "");
       setMaindescription(data.maindescription || "");
       setDescription(data.description || "");
       setPrice(data.price || "");
-      setNoTickets(data.NoTickets || "");
+      setNoRooms(data.NoRooms || "");
       setAddress(data.Address || "");
       setAddress1(data.Address1 || "");
       setGooglemap(data.location || "");
       setTel(data.usertel || "");
+      setVirtualVideo(data.VirtualVideo || "");
     }
   }, [data]);
 
@@ -241,7 +225,8 @@ export default function UpdateDestination() {
   };
 
   const validationSchema = Yup.object().shape({
-    title: Yup.string().trim().required("Destination Name is required"),
+    title: Yup.string().trim().required("Hotel Name is required"),
+    category: Yup.string().trim().required("Category is required"),
     maindescription: Yup.string()
       .max(100, "Main Description must be at most 100 characters")
       .trim()
@@ -253,9 +238,10 @@ export default function UpdateDestination() {
     price: Yup.number()
       .required("Price is required")
       .positive("Price must be greater than 0"),
-    NoTickets: Yup.number()
+    NoRooms: Yup.number()
       .required("Number of Tickets is required")
       .integer("Number of Tickets must be an integer"),
+    virtualVideo: Yup.string().trim().required("Virtual Video is required"),
     Address: Yup.string().trim().required("Address is required"),
     Address1: Yup.string().trim().required("Address is required"),
     googlemap: Yup.string().trim().required("Location is required"),
@@ -265,6 +251,11 @@ export default function UpdateDestination() {
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
     setTitleerror("");
+  };
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+    setCategoryerror("");
   };
 
   const handleMaindescriptionChange = (e) => {
@@ -287,14 +278,19 @@ export default function UpdateDestination() {
     setImage2error("");
   };
 
+  const handleVirtualVideoChange = (e) => {
+    setVirtualVideo(e.target.value);
+    setVirtualVideoerror("");
+  };
+
   const handlePriceChange = (e) => {
     setPrice(e.target.value);
     setPriceerror("");
   };
 
-  const handleNoTicketsChange = (e) => {
-    setNoTickets(e.target.value);
-    setNoTicketserror("");
+  const handleNoRoomsChange = (e) => {
+    setNoRooms(e.target.value);
+    setNoRoomserror("");
   };
 
   const handleAddressChange = (e) => {
@@ -325,12 +321,14 @@ export default function UpdateDestination() {
       await validationSchema.validate(
         {
           title,
+          category,
           maindescription,
           description,
           price,
-          NoTickets,
+          NoRooms,
           Address,
           Address1,
+          virtualVideo,
           googlemap,
           tel,
         },
@@ -354,15 +352,17 @@ export default function UpdateDestination() {
         url2 = await getDownloadURL(uploadTask2.ref);
       }
 
-      await updateDestinationById(
+      await updateHotelById(
         idState,
         title,
+        category,
         maindescription,
         description,
         finalUrl1,
         finalUrl2,
+        virtualVideo,
         price,
-        NoTickets,
+        NoRooms,
         Address,
         Address1,
         googlemap,
@@ -371,19 +371,22 @@ export default function UpdateDestination() {
         tel
       );
 
-      toast.success("Destination Updated Successfully");
+      toast.success("Hotel Updated Successfully");
       navigate("/home");
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log("Error Updating Destination", error);
-      toast.error("Error Updating Destination");
+      console.log("Error Updating Hotel", error);
+      toast.error("Error Updating Hotel");
 
       if (error.name === "ValidationError") {
         error.inner.forEach((e) => {
           switch (e.path) {
             case "title":
               setTitleerror(e.message);
+              break;
+            case "category":
+              setCategoryerror(e.message);
               break;
             case "maindescription":
               setMaindescriptionerror(e.message);
@@ -397,11 +400,14 @@ export default function UpdateDestination() {
             case "image2":
               setImage2error(e.message);
               break;
+            case "virtualVideo":
+              setVirtualVideoerror(e.message);
+              break;
             case "price":
               setPriceerror(e.message);
               break;
-            case "NoTickets":
-              setNoTicketserror(e.message);
+            case "NoRooms":
+              setNoRoomserror(e.message);
               break;
             case "Address":
               setAddresserror(e.message);
@@ -455,7 +461,7 @@ export default function UpdateDestination() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Hotel Management
           </Typography>
           <FormGroup
             sx={{
@@ -584,13 +590,13 @@ export default function UpdateDestination() {
             textAlign="center"
             sx={{ color: handleColor() }}
           >
-            Update Destination
+            Update Hotel
           </Typography>
-          <Grid container spacing={2} sx={{ marginTop: "5vh" }}>
+          <Grid container spacing={2} sx={{ marginTop: "1vh" }}>
             <Grid item xs={12} sm={6}>
               <TextField
                 id="outlined-basic"
-                label="Destination Name"
+                label="Hotel Name"
                 variant="outlined"
                 fullWidth
                 value={title || data?.title}
@@ -598,6 +604,25 @@ export default function UpdateDestination() {
                   handleTitleChange(e);
                 }}
                 helperText={titleerror}
+                error={false}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Category"
+                variant="outlined"
+                fullWidth
+                value={category || data?.category}
+                onChange={(e) => {
+                  handleCategoryChange(e);
+                }}
+                helperText={categoryerror}
                 error={false}
                 InputProps={{
                   sx: {
@@ -692,6 +717,27 @@ export default function UpdateDestination() {
                   endAdornment: <AttachFileIcon />,
                 }}
               />
+                <TextField
+                id="outlined-multiline-static"
+                label="Virtual Video Link"
+                variant="outlined"
+                fullWidth
+                value={virtualVideo || data?.VirtualVideo}
+                onChange={(e) => {
+                  handleVirtualVideoChange(e);
+                }}
+                helperText={virtualVideoerror}
+                inputProps={{
+                  maxLength: 400,
+                }}
+                InputProps={{
+                  sx: {
+                    color: handleColor(),
+                    fontSize: "20px",
+                    borderRadius: "20px",
+                  },
+                }}
+              />
             </Grid>
             <Grid
               item
@@ -731,12 +777,12 @@ export default function UpdateDestination() {
                 id="outlined-basic"
                 label="No of Tickets "
                 variant="outlined"
-                value={NoTickets || data?.NoTickets}
+                value={NoRooms || data?.NoRooms}
                 onChange={(e) => {
-                  handleNoTicketsChange(e);
+                  handleNoRoomsChange(e);
                 }}
                 error={false}
-                helperText={NoTicketserror}
+                helperText={NoRoomserror}
                 sx={{ marginLeft: "1vw", width: "15vw" }}
                 inputProps={{
                   maxLength: 400,
@@ -858,9 +904,9 @@ export default function UpdateDestination() {
             <Grid item xs={12} sm={6}>
               <Iframe
                 id="myId"
-                src={googlemap || data?.location}
+                src={googlemap}
                 width="350vw"
-                height="200vh"
+                height="100vh"
                 styles={{ borderRadius: "20px" }}
                 allowfullscreen="true"
                 loading="lazy"
@@ -877,27 +923,28 @@ export default function UpdateDestination() {
                 alignItems: "right",
               }}
             >
-                {loading ? (
-                     <CircularProgress variant="determinate" value={progress} />
-                ):(
-              <Button
-                variant="contained"
-                sx={{
-                  marginTop: "4vh",
-                  width: "10vw",
-                  height: "5vh",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "black",
-                  color: "white",
-                }}
-                onClick={handleSubmit}
-              >
-                Update
-              </Button>
-                )}
+              {loading ? (
+                <CircularProgress variant="determinate" value={progress} />
+              ) : (
+                <Button
+                  variant="contained"
+                  sx={{
+                    marginTop: "2vh",
+                    width: "10vw",
+                    height: "5vh",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "black",
+                    color: "white",
+                    borderRadius: "20px",
+                  }}
+                  onClick={handleSubmit}
+                >
+                  Update
+                </Button>
+              )}
             </Grid>
           </Grid>
         </div>

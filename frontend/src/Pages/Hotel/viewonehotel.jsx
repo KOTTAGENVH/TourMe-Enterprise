@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
-import { getDestinationById } from "../../Api/services/destinationService";
+import CloseIcon from "@mui/icons-material/Close";
 import { styled, createTheme } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Link from "@mui/material/Link";
+import Modal from "@mui/material/Modal";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { ToastContainer } from "react-toastify";
@@ -38,24 +38,7 @@ import {
   MDBCarouselItem,
   MDBCarouselCaption,
 } from "mdb-react-ui-kit";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { getHotelById } from "../../Api/services/hotelService";
 
 const drawerWidth = 240;
 
@@ -105,15 +88,18 @@ const Drawer = styled(MuiDrawer, {
 
 const defaultTheme = createTheme();
 
-function ViewOneDestination() {
+function ViewOneHotel() {
   const settings = ["Profile", "Logout"];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+  const [openmodal, setOpenModal] = React.useState(false);
 
   const darkmode = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const idState = useSelector((state) => state.id.id);
+  const handleOpen = () => setOpenModal(true);
+  const handleClose = () => setOpenModal(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -165,7 +151,7 @@ function ViewOneDestination() {
   };
 
   const { data, isLoading, error, isError } = useQuery({
-    queryFn: () => getDestinationById(idState),
+    queryFn: () => getHotelById(idState),
   });
 
   return (
@@ -182,7 +168,7 @@ function ViewOneDestination() {
       >
         <Toolbar
           sx={{
-            pr: "24px", // keep right padding when drawer closed
+            pr: "24px",
           }}
         >
           <IconButton
@@ -204,7 +190,7 @@ function ViewOneDestination() {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            Destination Management
+            Hotel Management
           </Typography>
           <FormGroup
             sx={{
@@ -444,14 +430,14 @@ function ViewOneDestination() {
             <Typography
               variant="h6"
               sx={{
-                margin: "20px",
+                margin: "15px",
                 justifyContent: "center",
                 alignContent: "center",
                 alignSelf: "center",
                 fontSize: "30px",
               }}
             >
-              Ticket Price: Rs. {data.price}
+              Category : {data.category}
             </Typography>
             <Typography
               variant="h6"
@@ -463,7 +449,19 @@ function ViewOneDestination() {
                 fontSize: "30px",
               }}
             >
-              No Tickets Avaialable: {data.NoTickets}
+              Room Price: Rs. {data.price}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                margin: "20px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "30px",
+              }}
+            >
+              No Of Rooms Avaialable: {data.NoRooms}
             </Typography>
             <Typography
               variant="h6"
@@ -514,6 +512,22 @@ function ViewOneDestination() {
             >
               Address : {data.Address}, {data.Address1}
             </Typography>
+            <Button
+              sx={{
+                margin: "20px",
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                fontSize: "20px",
+                fontWeight: "bold",
+                backgroundColor: darkmode ? "#2a3eb1" : "#2979ff",
+                color: handleColor(),
+                borderRadius: "20px",
+              }}
+              onClick={handleOpen}
+            >
+              View Virtually
+            </Button>
             <Iframe
               id="myId"
               src={data.location}
@@ -547,8 +561,59 @@ function ViewOneDestination() {
           Sorry the page requested is not available!
         </Typography>
       )}
+      <Modal
+        open={openmodal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        sx={{
+          justifySelf: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+          alignSelf: "center",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 900,
+            height: 700,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              position: "absolute",
+              right: "10px",
+              top: "10px",
+              color: "black",
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Iframe
+            id="myId"
+            src={data?.VirtualVideo}
+            width="100%"
+            height="100%"
+            styles={{ borderRadius: "20px" }}
+            allowfullscreen="true"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          />
+        </Box>
+      </Modal>
     </Box>
   );
 }
 
-export default ViewOneDestination;
+export default ViewOneHotel;
