@@ -1,4 +1,4 @@
-# Tour-Me---Frontend (Customer side Demo)
+# Tour-Me---Frontend (Buisness side Demo [Souvenier,Destination,Hotel])
 
 
 ><img width="1675" alt="Screenshot 2024-02-14 at 05 06 52" src="https://github.com/KOTTAGENVH/TourMe-Enterprise/assets/87430226/a645e8e4-b2d1-4a9e-9f2e-a3abf794f58c">
