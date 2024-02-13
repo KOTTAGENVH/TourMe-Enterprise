@@ -112,12 +112,6 @@ const MainListItems = () => {
         <ListItemText primary="Check Orders" />
       </ListItemButton>
       <Divider />
-      <ListItemButton>
-        <ListItemIcon>
-          <DoneOutlineIcon />
-        </ListItemIcon>
-        <ListItemText primary="Validate Ticket" />
-      </ListItemButton>
     </React.Fragment>
   );
 };

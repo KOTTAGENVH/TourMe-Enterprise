@@ -326,12 +326,8 @@ export default function Souvenierorder() {
     muiPaginationProps: {
       rowsPerPageOptions: [2, 3],
     },
-    initialState: { density: 'comfortable',pagination: { pageSize: 3, pageIndex: 1 }
-  
-    
-  },
-
-    rowCount: filteredResults?.length,
+    initialState: { density: 'compact', pagination: { pageSize: 3, pageIndex: 0 } },
+    paginationDisplayMode: 'pages',
   });
 
   const handleView = (row) => {
