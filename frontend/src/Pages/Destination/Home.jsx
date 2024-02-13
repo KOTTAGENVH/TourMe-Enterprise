@@ -1,6 +1,5 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import { styled } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import MuiAppBar from "@mui/material/AppBar";
@@ -9,49 +8,30 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Link from "@mui/material/Link";
+import CircularProgress from "@mui/material/CircularProgress";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import MainListItems from "./Components/listItems";
 import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Brightness5Icon from "@mui/icons-material/Brightness5";
 import Brightness3Icon from "@mui/icons-material/Brightness3";
-import { Image } from "@mui/icons-material";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
 import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
 import { useNavigate } from "react-router-dom";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { useSelector } from "react-redux";
+import { useQuery } from "react-query";
+import { getDestinationOrdersBySellerEmail } from "../../Api/services/destinationService";
+import "../Destination/CSS/calendar.css";
+import { useMemo } from "react";
 
 const drawerWidth = 240;
 
@@ -99,17 +79,24 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
 export default function Dashboard() {
   const settings = ["Profile", "Logout"];
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
+  const [fontSize, setFontSize] = React.useState(20);
+  const [progress, setProgress] = React.useState(20);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const localizer = momentLocalizer(moment);
+  const darkmodes = useSelector((state) => state.darkmode.darkmode);
+  const loggedUser = useSelector((state) => state.auth.loggedUser);
+
+  const { data, isLoading, error, isError } = useQuery({
+    queryFn: () => getDestinationOrdersBySellerEmail(loggedUser?.email),
+  });
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -147,6 +134,64 @@ export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleColor = () => {
+    if (darkmodes) {
+      return "white";
+    } else {
+      return "black";
+    }
+  };
+
+  React.useEffect(() => {
+    const box = document.getElementById("myBox");
+    const boxWidth = box.offsetWidth;
+    const boxHeight = box.offsetHeight;
+
+    const idealFontSize = Math.min(boxWidth / 25, boxHeight / 15);
+
+    setFontSize(idealFontSize);
+  }, []);
+
+  const events = useMemo(() => {
+    if (!data || !Array.isArray(data)) return [];
+
+    return data.map((item) => ({
+      title: item.InvoiceNo,
+      start: moment(item.date, "DD/MM/YYYY").toDate(),
+      end: moment(item.date, "DD/MM/YYYY").toDate(),
+    }));
+  }, [data]);
+
+  const CustomAgenda = ({ events }) => {
+    return (
+      <div className="rbc-agenda-table">
+        <table>
+          <thead>
+            <tr>
+              <th className="rbc-header" style={{ width: "50%" }}>
+                Invoice No
+              </th>
+              <th className="rbc-header" style={{ width: "50%" }}>
+                Time
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.id}>
+                <td className="rbc-agenda-cell">{event.title}</td>
+                <td className="rbc-agenda-cell">
+                  {moment(event.start).format("LT")} -{" "}
+                  {moment(event.end).format("LT")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
   return (
@@ -292,7 +337,86 @@ export default function Dashboard() {
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>
-     
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <Box
+            id="myBox"
+            sx={{
+              background: "rgba(255, 255, 255, 0.1)",
+              boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+              backdropFilter: "blur( 10px )",
+              borderRadius: "10px",
+              width: "30vw",
+              height: "30vh",
+              marginLeft: "50px",
+              marginTop: "100px",
+              color: handleColor(),
+              fontSize: `${fontSize}px`, // Set the font size dynamically
+              padding: "20px",
+              overflowWrap: "break-word", // To allow long words to wrap
+            }}
+          >
+            This is a small project done by me(Nowen Kottage) using the MERN
+            stack, Redux, Rapid Api. The main motive of this project is to give
+            the user a platform where they can find details of Sri - Lanka and
+            also book hotels, destinations and purchase souvenirs. Also give
+            suggestions to local taxi firms.Pls note that this is a DEMO. Note:
+            Images and text were taken from the internet.
+          </Box>
+          {isLoading ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+                width: "30vw",
+                marginLeft: "50px",
+                marginTop: "20px",
+                color: handleColor(),
+                fontSize: "20px",
+                padding: "20px",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                backdropFilter: "blur(10px)",
+                borderRadius: "20px",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          ) : (
+            <Calendar
+              className={darkmodes ? "dark-calendar" : "light-calendar"}
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{
+                height: "50vh",
+                width: 600,
+                marginLeft: "50px",
+                marginTop: "20px",
+                color: handleColor(),
+                fontSize: "20px",
+                padding: "20px",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                backdropFilter: "blur(10px)",
+                borderRadius: "20px",
+              }}
+              components={{
+                agenda: {
+                  event: () => <CustomAgenda events={events} />, 
+                },
+              }}
+            />
+          )}
+        </div>
+      </div>
     </Box>
   );
 }

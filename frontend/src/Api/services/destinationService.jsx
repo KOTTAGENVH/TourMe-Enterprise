@@ -133,3 +133,16 @@ export const updateDestinationById = async (
     return error;
   }
 };
+
+//Get Destination orders by seller email
+export const getDestinationOrdersBySellerEmail = async (selleremail) => {
+  try {
+    const response = await apiClient.get(
+      `/destination-order/get-destination-order-by-seller-email/${selleremail}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

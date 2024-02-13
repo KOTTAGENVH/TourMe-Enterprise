@@ -8,6 +8,7 @@ import HotelHome from "./Pages/Hotel/Home";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import lighbackground from "../src/Resources/TourMeBackground2.jpeg";
 import darkbackground from "../src/Resources/TourMeBackgroundDark.jpeg";
 import Checkpassword from "./Pages/Destination/Components/AdminAccess/checkpasswordAdd";
