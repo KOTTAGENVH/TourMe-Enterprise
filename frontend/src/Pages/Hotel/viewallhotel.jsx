@@ -159,8 +159,8 @@ function ViewAllHotels() {
   // Filtering destinations based on the search text
   const filteredDestinations = data?.length > 0 ? data.filter(
     (hotel) =>
-      hotel.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      hotel.category.toLowerCase().includes(searchText.toLowerCase())
+      hotel?.title?.toLowerCase().includes(searchText?.toLowerCase()) ||
+      hotel?.category?.toLowerCase().includes(searchText?.toLowerCase())
   ) : [];
 
 

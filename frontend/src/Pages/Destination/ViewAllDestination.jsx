@@ -178,7 +178,7 @@ function ViewAllDestination() {
 
   // Filtering destinations based on the search text
   const filteredDestinations = data?.destinations?.filter((destination) =>
-    destination.title.toLowerCase().includes(searchText.toLowerCase())
+    destination?.title?.toLowerCase().includes(searchText?.toLowerCase())
   );
 
   return (

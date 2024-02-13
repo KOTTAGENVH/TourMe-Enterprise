@@ -83,7 +83,9 @@ export const deleteSouvenierById = async (id) => {
 //Get Souvenier by Email
 export const getSouvenierByEmail = async (email) => {
   try {
-    const response = await apiClient.get(`/souvenier/get-souvenier-by-selleremail/${email}`);
+    const response = await apiClient.get(
+      `/souvenier/get-souvenier-by-selleremail/${email}`
+    );
     return response.data;
   } catch (error) {
     return error;
@@ -133,6 +135,33 @@ export const updateSouvenierById = async (
     return response.data;
   } catch (error) {
     console.log(error);
+    return error;
+  }
+};
+
+//Get Souvenier Orders by seller email
+export const getSouvenierOrders = async (selleremail) => {
+  try {
+    const response = await apiClient.get(
+      `/souvenier-order/get-souvenier-order-by-selleremail/${selleremail}`
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+//Update souvenier order
+export const updateSouvenierOrder = async (id,status) => {
+  try {
+    const response = await apiClient.patch(
+      `/souvenier-order/update-souvenier-order/${id}`,
+      {
+        state: status,
+      }
+    );
+    return response.data;
+  } catch (error) {
     return error;
   }
 };

@@ -32,6 +32,8 @@ import { useQuery } from "react-query";
 import { getDestinationOrdersBySellerEmail } from "../../Api/services/destinationService";
 import "../Destination/CSS/calendar.css";
 import { useMemo } from "react";
+import Chart from "chart.js/auto";
+import { useRef } from "react";
 
 const drawerWidth = 240;
 
@@ -86,8 +88,8 @@ export default function Dashboard() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [fontSize, setFontSize] = React.useState(20);
-  const [progress, setProgress] = React.useState(20);
 
+  const chartRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const localizer = momentLocalizer(moment);
@@ -193,6 +195,65 @@ export default function Dashboard() {
       </div>
     );
   };
+
+  const getOrderCountByMonth = (month) => {
+    if (!data || !Array.isArray(data)) return 0;
+
+    return data.filter(
+      (item) => moment(item.date, "DD/MM/YYYY").month() === month
+    ).length;
+  };
+
+  // Calculate order counts for each month
+  const orderCounts = Array.from({ length: 12 }, (_, i) =>
+    getOrderCountByMonth(i)
+  );
+
+  React.useEffect(() => {
+    const ctx = chartRef.current.getContext("2d");
+
+    const chart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ],
+        datasets: [
+          {
+            label: "Order Count by Month",
+            data: orderCounts,
+            backgroundColor: [
+              "red",
+              "blue",
+              "green",
+              "orange",
+              "purple",
+              "pink",
+              "cyan",
+              "magenta",
+              "yellow",
+              "brown",
+              "lightblue",
+              "lightgreen",
+            ],
+          },
+        ],
+      },
+    });
+
+    return () => chart.destroy();
+  }, [orderCounts]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -365,8 +426,7 @@ export default function Dashboard() {
             This is a small project done by me(Nowen Kottage) using the MERN
             stack, Redux, Rapid Api. The main motive of this project is to give
             the user a platform where they can find details of Sri - Lanka and
-            also book hotels, destinations and purchase souvenirs. Also give
-            suggestions to local taxi firms.Pls note that this is a DEMO. Note:
+            also book hotels, destinations and purchase souvenirs.Pls note that this is a DEMO. Note:
             Images and text were taken from the internet.
           </Box>
           {isLoading ? (
@@ -410,11 +470,29 @@ export default function Dashboard() {
               }}
               components={{
                 agenda: {
-                  event: () => <CustomAgenda events={events} />, 
+                  event: () => <CustomAgenda events={events} />,
                 },
               }}
             />
           )}
+        </div>
+        <div
+        style={{
+          width: "40vw",
+          height : "40vw",
+          marginLeft: "100px",
+          marginTop: "160px",
+          background: "rgba(255, 255, 255, 0.1)", 
+          backdropFilter: "blur(10px)", 
+          borderRadius: "20px", 
+          padding: "20px",
+          color: handleColor(),
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}
+        >
+          <canvas ref={chartRef} />
         </div>
       </div>
     </Box>

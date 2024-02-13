@@ -136,3 +136,27 @@ export const updateHotelById = async (
     return error;
   }
 };
+
+//Get Hotel orders by seller email
+export const getHotelOrdersBySellerEmail = async (selleremail) => {
+  try {
+    const response = await apiClient.get(
+      `/hotel-order/get-hotel-order-by-selleremail/${selleremail}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+//Delete Hotel Order By Id  
+export const deleteHotelOrderById = async (id) => {
+  try {
+    const response = await apiClient.delete(`/hotel-order/delete-hotel-order/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

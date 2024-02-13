@@ -8,7 +8,7 @@ import HotelHome from "./Pages/Hotel/Home";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import lighbackground from "../src/Resources/TourMeBackground2.jpeg";
 import darkbackground from "../src/Resources/TourMeBackgroundDark.jpeg";
 import Checkpassword from "./Pages/Destination/Components/AdminAccess/checkpasswordAdd";
@@ -26,9 +26,15 @@ import AddHotel from "./Pages/Hotel/AddHotel";
 import ViewAllHotels from "./Pages/Hotel/viewallhotel";
 import UpdateHotel from "./Pages/Hotel/updatehotel";
 import ViewOneHotel from "./Pages/Hotel/viewonehotel";
+import Souvenierorder from "./Pages/Souvenier/souvenierorder";
+import Hotelorder from "./Pages/Hotel/hotelorder";
+import Destinationorder from "./Pages/Destination/destinationorder";
+
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const darkmode = useSelector((state) => state.darkmode.darkmode);
+
+  const isMobileOrTablet = window.matchMedia("(max-width: 1024px)").matches;
 
   const handleCss = () => {
     if (darkmode) {
@@ -53,43 +59,50 @@ function App() {
         boxSizing: "border-box",
       }}
     >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/forgot" element={<ForgetPassword />} />
-          <Route path="/signup" element={<SignUp />} />
-          {loggedUser.role === "destination" && (
-            <>
-              <Route path="/home" element={<Home />} />
-              <Route path="/viewall" element={<ViewAllDestination />} />
-              <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addItem" element={<AddDestination />} />
-              <Route path="/viewOne" element={<ViewOneDestination />} />
-              <Route path="/update" element={<UpdateDestination />} />
-            </>
-          )}
-          {loggedUser.role === "hotel" && (
-            <>
-              <Route path="/home" element={<HotelHome />} />
-              <Route path="/viewall" element={<ViewAllHotels />} />
-              <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addItem" element={<AddHotel />} />
-              <Route path="/viewOne" element={<ViewOneHotel />} />
-              <Route path="/update" element={<UpdateHotel />} />
-            </>
-          )}
-          {loggedUser.role === "souvnier" && (
-            <>
-              <Route path="/home" element={<SouvenierHome />} />
-              <Route path="/viewall" element={<ViewAllSouvenier />} />
-              <Route path="/adminaccess/:pass" element={<Checkpassword />} />
-              <Route path="/addItem" element={<AddSouvenier />} />
-              <Route path="/viewOne" element={<ViewOneSouvenier />} />
-              <Route path="/update" element={<UpdateSouvenier />} />
-            </>
-          )}
-        </Routes>
-      </BrowserRouter>
+      {isMobileOrTablet ? (
+        <h1>Sorry, this is optimized for POS and Laptop only</h1>
+      ) : (
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<SignIn />} />
+            <Route path="/forgot" element={<ForgetPassword />} />
+            <Route path="/signup" element={<SignUp />} />
+            {loggedUser.role === "destination" && (
+              <>
+                <Route path="/home" element={<Home />} />
+                <Route path="/viewall" element={<ViewAllDestination />} />
+                <Route path="/adminaccess/:pass" element={<Checkpassword />} />
+                <Route path="/addItem" element={<AddDestination />} />
+                <Route path="/viewOne" element={<ViewOneDestination />} />
+                <Route path="/update" element={<UpdateDestination />} />
+                <Route path="/order" element={<Destinationorder />} />
+              </>
+            )}
+            {loggedUser.role === "hotel" && (
+              <>
+                <Route path="/home" element={<HotelHome />} />
+                <Route path="/viewall" element={<ViewAllHotels />} />
+                <Route path="/adminaccess/:pass" element={<Checkpassword />} />
+                <Route path="/addItem" element={<AddHotel />} />
+                <Route path="/viewOne" element={<ViewOneHotel />} />
+                <Route path="/update" element={<UpdateHotel />} />
+                <Route path="/order" element={<Hotelorder />} />
+              </>
+            )}
+            {loggedUser.role === "souvnier" && (
+              <>
+                <Route path="/home" element={<SouvenierHome />} />
+                <Route path="/viewall" element={<ViewAllSouvenier />} />
+                <Route path="/adminaccess/:pass" element={<Checkpassword />} />
+                <Route path="/addItem" element={<AddSouvenier />} />
+                <Route path="/viewOne" element={<ViewOneSouvenier />} />
+                <Route path="/update" element={<UpdateSouvenier />} />
+                <Route path="/order" element={<Souvenierorder />} />
+              </>
+            )}
+          </Routes>
+        </BrowserRouter>
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ const MainListItems = () => {
   const isDashboard = window.location.pathname.includes("home");
   const isViewAllDestination = window.location.pathname.includes("viewall");
   const isViewOneDestination = window.location.pathname.includes("viewOne");
+  const isorder = window.location.pathname.includes("order");
 
   const handleColor = () => {
     if (darkmode) {
@@ -61,12 +62,16 @@ const MainListItems = () => {
       <ListItemButton
         onClick={() => {
           navigate("/viewall");
-        }} 
+        }}
         sx={{
-          backgroundColor: isViewAllDestination||isViewOneDestination
-            ? handleBackgroundColor()
-            : "inherit",
-          color: isViewAllDestination||isViewOneDestination ? handleColor() : "inherit",
+          backgroundColor:
+            isViewAllDestination || isViewOneDestination
+              ? handleBackgroundColor()
+              : "inherit",
+          color:
+            isViewAllDestination || isViewOneDestination
+              ? handleColor()
+              : "inherit",
         }}
       >
         <ListItemIcon>
@@ -96,7 +101,16 @@ const MainListItems = () => {
         <ListItemText primary="Add" />
       </ListItemButton>
       <Divider />
-      <ListItemButton>
+      <ListItemButton
+        onClick={() => {
+          navigate("/order");
+        }}
+        sx={{
+          backgroundColor:
+            isorder || isorder ? handleBackgroundColor() : "inherit",
+          color: isorder || isorder ? handleColor() : "inherit",
+        }}
+      >
         <ListItemIcon>
           <BarChartIcon />
         </ListItemIcon>

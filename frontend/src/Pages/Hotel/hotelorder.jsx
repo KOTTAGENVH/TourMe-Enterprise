@@ -21,8 +21,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Brightness5Icon from "@mui/icons-material/Brightness5";
 import Brightness3Icon from "@mui/icons-material/Brightness3";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
 import { setdarkmode } from "../../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../../Redux/auth/authAction";
@@ -30,9 +28,21 @@ import { useSelector } from "react-redux";
 import { useQuery } from "react-query";
 import "../Destination/CSS/calendar.css";
 import { useMemo } from "react";
-import Chart from "chart.js/auto";
-import { useRef } from "react";
-import { getHotelOrdersBySellerEmail } from "../../Api/services/hotelService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import Chip from "@mui/material/Chip";
+import { useNavigate } from "react-router-dom";
+import { setidAction } from "../../Redux/storeid/storeidAction";
+import { deleteHotelOrderById, getHotelOrdersBySellerEmail } from "../../Api/services/hotelService";
 
 const drawerWidth = 240;
 
@@ -80,17 +90,20 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-export default function Dashboard() {
+export default function Hotelorder() {
   const settings = ["Profile", "Logout"];
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
-  const [fontSize, setFontSize] = React.useState(20);
+  const [open, setOpen] = React.useState(true);
+  const [rowsPerPage, setRowsPerPage] = React.useState(3);
+  const [selectedDate, setSelectedDate] = React.useState(null);
+  const [opendialog, setOpenDialog] = React.useState(false);
+  const [id, setid] = React.useState("");
 
-  const chartRef = useRef();
   const dispatch = useDispatch();
-  const localizer = momentLocalizer(moment);
+  const navigate = useNavigate();
   const darkmodes = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
 
@@ -98,15 +111,43 @@ export default function Dashboard() {
     queryFn: () => getHotelOrdersBySellerEmail(loggedUser?.email),
   });
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleClickOpen = (id) => {
+    setid(id);
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+
+  let formattedSelectedDate = null;
+
+  if (selectedDate) {
+    const dateObject = new Date(selectedDate);
+    formattedSelectedDate = dateObject.toLocaleDateString("en-GB");
+  }
+
+  // Apply filter function to the data if data is available
+  const filteredData = data ?? []; // Providing a default value for data
+
+  // Only filter data if the selected date is defined
+  const filteredResults = selectedDate
+    ? filteredData.filter((item) => {
+        // Format item date to DD/MM/YYYY
+        // const itemDate = item.date.split("/").reverse().join("/");
+        return item?.date === formattedSelectedDate;
+      })
+    : filteredData;
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
@@ -131,7 +172,6 @@ export default function Dashboard() {
     }
   };
 
-  const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -144,117 +184,154 @@ export default function Dashboard() {
     }
   };
 
-  React.useEffect(() => {
-    const box = document.getElementById("myBox");
-    const boxWidth = box.offsetWidth;
-    const boxHeight = box.offsetHeight;
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "InvoiceNo",
+        header: "Invoice No",
+        size: 150,
+      },
+      {
+        accessorKey: "productname",
+        header: "Product Name",
+        size: 150,
+      },
+      {
+        accessorKey: "total",
+        header: "Total Quantity",
+        size: 200,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 150,
+        Cell: ({ row }) => (
+          <div>
+            {row.original.status === "Booked" && (
+              <Chip
+                label="Booked"
+                sx={{
+                  backgroundColor: "green",
+                  color: "white",
+                }}
+              />
+            )}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "date",
+        header: "Date",
+        size: 150,
+      },
+      {
+        accessorKey: "actions",
+        header: "Actions",
+        size: 150,
+        Cell: ({ row }) => (
+          <div>
+            <IconButton
+              onClick={() => handleView(row)}
+              sx={{
+                margin: "5px",
+                padding: "8px",
+              }}
+            >
+              <RemoveRedEyeIcon />
+            </IconButton>
 
-    const idealFontSize = Math.min(boxWidth / 25, boxHeight / 15);
-
-    setFontSize(idealFontSize);
-  }, []);
-
-  const events = useMemo(() => {
-    if (!data || !Array.isArray(data)) return [];
-
-    return data.map((item) => ({
-      title: item.InvoiceNo,
-      start: moment(item.date, "DD/MM/YYYY").toDate(),
-      end: moment(item.date, "DD/MM/YYYY").toDate(),
-    }));
-  }, [data]);
-
-  const CustomAgenda = ({ events }) => {
-    return (
-      <div className="rbc-agenda-table">
-        <table>
-          <thead>
-            <tr>
-              <th className="rbc-header" style={{ width: "50%" }}>
-                Invoice No
-              </th>
-              <th className="rbc-header" style={{ width: "50%" }}>
-                Time
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map((event) => (
-              <tr key={event.id}>
-                <td className="rbc-agenda-cell">{event.title}</td>
-                <td className="rbc-agenda-cell">
-                  {moment(event.start).format("LT")} -{" "}
-                  {moment(event.end).format("LT")}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  const getOrderCountByMonth = (month) => {
-    if (!data || !Array.isArray(data)) return 0;
-
-    return data.filter(
-      (item) => moment(item.date, "DD/MM/YYYY").month() === month
-    ).length;
-  };
-
-  // Calculate order counts for each month
-  const orderCounts = Array.from({ length: 12 }, (_, i) =>
-    getOrderCountByMonth(i)
+            <Button
+              onClick={() => handleClickOpen(row?.original?._id)}
+              sx={{
+                backgroundColor: "red",
+                color: handleColor(),
+                borderRadius: "20px",
+                margin: "5px",
+                padding: "8px",
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    []
   );
 
   React.useEffect(() => {
-    const ctx = chartRef.current.getContext("2d");
+    // Retrieve the rowsPerPage value from local storage
+    const storedRowsPerPage = localStorage.getItem("rowsPerPage");
+    if (storedRowsPerPage) {
+      setRowsPerPage(parseInt(storedRowsPerPage));
+    }
+  }, []);
 
-    const chart = new Chart(ctx, {
-      type: "pie",
-      data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ],
-        datasets: [
-          {
-            label: "Order Count by Month",
-            data: orderCounts,
-            backgroundColor: [
-              "red",
-              "blue",
-              "green",
-              "orange",
-              "purple",
-              "pink",
-              "cyan",
-              "magenta",
-              "yellow",
-              "brown",
-              "lightblue",
-              "lightgreen",
-            ],
-          },
-        ],
+  // Update the rowsPerPage value in local storage when it changes
+  React.useEffect(() => {
+    localStorage.setItem("rowsPerPage", rowsPerPage);
+  }, [rowsPerPage]);
+
+  // Other parts of your component
+
+  const table = useMaterialReactTable({
+    columns,
+    data: filteredResults,
+    enableColumnActions: false,
+    enablePagination: true,
+    muiTableContainerProps: {
+      style: {
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        backdropFilter: "blur(10px)",
       },
-    });
+    },
+    muiPaginationProps: {
+      rowsPerPageOptions: [2, 3],
+    },
+    initialState: {
+      density: "comfortable",
+      pagination: { pageSize: 3, pageIndex: 1 },
+    },
 
-    return () => chart.destroy();
-  }, [orderCounts]);
+    rowCount: filteredResults?.length,
+  });
+
+  const handleView = (row) => {
+    dispatch(setidAction(row?.original?.hotelid));
+    navigate("/viewOne");
+  };
+
+  const handleDelete = (status) => {
+    try {
+      deleteHotelOrderById(id).then((res) => {
+        toast.success("Order Deleted Successfully");
+        setOpenDialog(false);
+        window.location.reload();
+      });
+    } catch (error) {
+      toast.error("Error in Cancelling Order");
+    }
+  };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        overflow: "hidden",
+        scrollbarColor: "rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5)",
+        scrollbarWidth: "thin",
+        "&::-webkit-scrollbar": {
+          width: "5px",
+        },
+        "&::-webkit-scrollbar-track": {
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        },
+      }}
+    >
+      <ToastContainer />
       <AppBar
         position="absolute"
         open={open}
@@ -398,100 +475,86 @@ export default function Dashboard() {
       </Drawer>
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
+          margin: "70px",
+          padding: "20px",
+          width: "80vw",
+          height: "50vh",
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
         }}
       >
-        <div>
-          <Box
-            id="myBox"
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Filter by date"
+            value={selectedDate}
+            onChange={handleDateChange}
             sx={{
-              background: "rgba(255, 255, 255, 0.1)",
-              boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
-              backdropFilter: "blur( 10px )",
-              borderRadius: "10px",
-              width: "30vw",
-              height: "30vh",
-              marginLeft: "50px",
-              marginTop: "100px",
               color: handleColor(),
-              fontSize: `${fontSize}px`, // Set the font size dynamically
-              padding: "20px",
-              overflowWrap: "break-word", // To allow long words to wrap
+              margin: "20px",
+              padding: "10px",
+              fontSize: "10px",
+              borderRadius: "20px",
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backdropFilter: "blur(10px)",
+              "& input, & label": {
+                color: handleColor(),
+              },
+            }}
+          />
+        </LocalizationProvider>
+        <MaterialReactTable table={table} />;
+        <Dialog
+          open={opendialog}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: {
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(10px)",
+            },
+          }}
+        >
+          <DialogTitle id="alert-dialog-title">
+            Confirm to delete this order?
+          </DialogTitle>
+          <DialogActions
+            sx={{
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(10px)",
+              justifyContent: "center",
+              alignContent: "center",
+              alignItems: "center",
+              color: handleColor(),
             }}
           >
-            This is a small project done by me(Nowen Kottage) using the MERN
-            stack, Redux, Rapid Api. The main motive of this project is to give
-            the user a platform where they can find details of Sri - Lanka and
-            also book hotels, destinations and purchase souvenirs. Pls note that this is a DEMO. Note:
-            Images and text were taken from the internet.
-          </Box>
-          {isLoading ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "50vh",
-                width: "30vw",
-                marginLeft: "50px",
-                marginTop: "20px",
+            <Button
+              sx={{
+                backgroundColor: "red",
                 color: handleColor(),
-                fontSize: "20px",
-                padding: "20px",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                backdropFilter: "blur(10px)",
                 borderRadius: "20px",
+                margin: "5px",
+                padding: "8px",
+              }}
+              onClick={() => handleDelete()}
+            >
+              Delete
+            </Button>
+            <Button
+              onClick={handleClose}
+              sx={{
+                backgroundColor: "blue",
+                color: handleColor(),
+                borderRadius: "20px",
+                margin: "5px",
+                padding: "8px",
               }}
             >
-              <CircularProgress />
-            </div>
-          ) : (
-            <Calendar
-              className={darkmodes ? "dark-calendar" : "light-calendar"}
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{
-                height: "50vh",
-                width: 600,
-                marginLeft: "50px",
-                marginTop: "20px",
-                color: handleColor(),
-                fontSize: "20px",
-                padding: "20px",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                backdropFilter: "blur(10px)",
-                borderRadius: "20px",
-              }}
-              components={{
-                agenda: {
-                  event: () => <CustomAgenda events={events} />,
-                },
-              }}
-            />
-          )}
-        </div>
-        <div
-        style={{
-          width: "40vw",
-          height : "40vw",
-          marginLeft: "100px",
-          marginTop: "160px",
-          background: "rgba(255, 255, 255, 0.1)", 
-          backdropFilter: "blur(10px)", 
-          borderRadius: "20px", 
-          padding: "20px",
-          color: handleColor(),
-          justifyContent: "center",
-          alignItems: "center",
-          display: "flex",
-        }}
-        >
-          <canvas ref={chartRef} />
-        </div>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </Box>
   );

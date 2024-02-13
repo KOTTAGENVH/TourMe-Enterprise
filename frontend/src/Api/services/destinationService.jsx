@@ -146,3 +146,16 @@ export const getDestinationOrdersBySellerEmail = async (selleremail) => {
     return error;
   }
 };
+
+//Delete Destination Order By Id
+export const deleteDestinationOrderById = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/destination-order/delete-destination-order/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

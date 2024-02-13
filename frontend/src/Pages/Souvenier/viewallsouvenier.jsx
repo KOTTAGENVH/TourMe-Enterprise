@@ -157,7 +157,7 @@ function ViewAllSouvenier() {
 
   // Filtering destinations based on the search text
   const filteredSouveniers = data?.length ? data.filter((souvenier) =>
-  souvenier.title.toLowerCase().includes(searchText.toLowerCase())
+  souvenier.title?.toLowerCase()?.includes(searchText?.toLowerCase())
 ) : [];
 
   return (
