@@ -8,7 +8,7 @@
 >>
 >Demo hosted Link: https://tour-me-enterprise.vercel.app
 >>
->Demo video PLay List Link:
+>Demo video Link:
 >>
 #Instructions to setup the project
 >
