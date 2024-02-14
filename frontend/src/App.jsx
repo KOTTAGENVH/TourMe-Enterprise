@@ -29,6 +29,7 @@ import ViewOneHotel from "./Pages/Hotel/viewonehotel";
 import Souvenierorder from "./Pages/Souvenier/souvenierorder";
 import Hotelorder from "./Pages/Hotel/hotelorder";
 import Destinationorder from "./Pages/Destination/destinationorder";
+import Profile from "./Pages/profile";
 
 function App() {
   const loggedUser = useSelector((state) => state.auth.loggedUser);
@@ -69,6 +70,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             {loggedUser.role === "destination" && (
               <>
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/viewall" element={<ViewAllDestination />} />
                 <Route path="/adminaccess/:pass" element={<Checkpassword />} />
@@ -80,6 +82,7 @@ function App() {
             )}
             {loggedUser.role === "hotel" && (
               <>
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/home" element={<HotelHome />} />
                 <Route path="/viewall" element={<ViewAllHotels />} />
                 <Route path="/adminaccess/:pass" element={<Checkpassword />} />
@@ -91,6 +94,7 @@ function App() {
             )}
             {loggedUser.role === "souvnier" && (
               <>
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/home" element={<SouvenierHome />} />
                 <Route path="/viewall" element={<ViewAllSouvenier />} />
                 <Route path="/adminaccess/:pass" element={<Checkpassword />} />

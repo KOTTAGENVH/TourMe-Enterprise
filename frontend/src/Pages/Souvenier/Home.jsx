@@ -32,6 +32,7 @@ import "../Destination/CSS/calendar.css";
 import { useMemo } from "react";
 import Chart from "chart.js/auto";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { getSouvenierOrders } from "../../Api/services/souvenierService";
 
 const drawerWidth = 240;
@@ -90,6 +91,7 @@ export default function Dashboard() {
 
   const chartRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const localizer = momentLocalizer(moment);
   const darkmodes = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
@@ -123,9 +125,10 @@ export default function Dashboard() {
 
     if (setting === "Logout") {
       dispatch(signOutAction());
+      navigate("/");
       handleCloseUserMenu();
     } else if (setting === "Profile") {
-      handleCloseUserMenu();
+      navigate("/profile");
     } else {
       handleCloseUserMenu();
     }

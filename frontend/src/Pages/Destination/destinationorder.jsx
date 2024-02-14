@@ -167,9 +167,10 @@ export default function Destinationorder() {
 
     if (setting === "Logout") {
       dispatch(signOutAction());
+      navigate("/");
       handleCloseUserMenu();
     } else if (setting === "Profile") {
-      handleCloseUserMenu();
+      navigate("/profile");
     } else {
       handleCloseUserMenu();
     }

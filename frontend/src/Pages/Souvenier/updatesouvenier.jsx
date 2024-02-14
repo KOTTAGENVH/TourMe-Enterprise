@@ -194,14 +194,14 @@ export default function UpdateSouvenier() {
 
     if (setting === "Logout") {
       dispatch(signOutAction());
+      navigate("/");
       handleCloseUserMenu();
     } else if (setting === "Profile") {
-      handleCloseUserMenu();
+      navigate("/profile");
     } else {
       handleCloseUserMenu();
     }
   };
-
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
