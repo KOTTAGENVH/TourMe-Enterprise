@@ -34,6 +34,6 @@
 >
 >Hotel
 >
->hotel@yahoo.com
+>Email: hotel@yahoo.com
 >
 >Password: Achi@123
