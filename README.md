@@ -18,7 +18,7 @@
 >
 >The react app would run in localhost 3000
 >
->Sign up as a customer or sign in using these exsisting customer credential below
+>Sign up as hotel/souvenier/destination or sign in using these exsisting credentials below
 >
 >Souvenier
 >
