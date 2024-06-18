@@ -46,6 +46,7 @@ function SignUp() {
         );
         if (res.error) {
           toast.error("Sorry, your data verification failed");
+          setLoading(false);
         } else {
           toast.success("Password changed successfully");
           formik.resetForm();
@@ -53,6 +54,7 @@ function SignUp() {
         }
       } catch (err) {
         toast.error("Sorry, your data verification failed");
+        setLoading(false);
       } finally {
         setLoading(false);
       }

@@ -45,7 +45,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-import { addSouvenier } from "../../Api/services/souvenierService";
 import { addHotel } from "../../Api/services/hotelService";
 
 const drawerWidth = 240;
@@ -96,7 +95,6 @@ const Drawer = styled(MuiDrawer, {
 
 export default function AddHotel() {
   const settings = ["Profile", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
@@ -158,9 +156,6 @@ export default function AddHotel() {
     }
   };
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -351,7 +346,6 @@ export default function AddHotel() {
         url2 = await getDownloadURL(uploadTask2.ref);
       }
 
-
       await addHotel(
         title,
         category,
@@ -482,19 +476,6 @@ export default function AddHotel() {
             />
           </FormGroup>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
           <Box
             sx={{
               flexGrow: 1,
@@ -569,7 +550,7 @@ export default function AddHotel() {
       </Drawer>
       <Box
         sx={{
-          height: "80vh auto",
+          maxHeight: "80vh",
           margin: "10vh",
           padding: "20px",
           width: "90vw",
@@ -579,6 +560,8 @@ export default function AddHotel() {
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
           marginBottom: "20px",
+          overflowY: "auto",
+          overflowX: "hidden",
         }}
       >
         <ToastContainer />

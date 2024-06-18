@@ -1,7 +1,6 @@
 import * as React from "react";
-import { styled, createTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
-import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import MuiAppBar from "@mui/material/AppBar";
@@ -12,8 +11,6 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import Grid from "@mui/material/Grid";
-import Modal from "@mui/material/Modal";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { MuiFileInput } from "mui-file-input";
@@ -41,7 +38,10 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
-import { getSouvenierById, updateSouvenierById } from "../../Api/services/souvenierService";
+import {
+  getSouvenierById,
+  updateSouvenierById,
+} from "../../Api/services/souvenierService";
 
 const drawerWidth = 240;
 
@@ -90,18 +90,16 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function UpdateSouvenier() {
-  const { data, isLoading, error, isError } = useQuery({
+  const { data } = useQuery({
     queryFn: () => getSouvenierById(idState),
   });
 
   const settings = ["Profile", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
   const [image2, setImage2] = React.useState(null);
   const [video, setVideo] = React.useState(null);
-  const [openmodal, setOpenModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [title, setTitle] = useState(data?.title || "");
@@ -128,16 +126,12 @@ export default function UpdateSouvenier() {
   const [telerror, setTelerror] = useState("");
   const [threedimageerror, setThreedimageerror] = useState("");
 
-  const handleOpen = () => setOpenModal(true);
-  const handleClose = () => setOpenModal(false);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const darkmode = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
   const idState = useSelector((state) => state.id.id);
-
 
   React.useEffect(() => {
     if (data) {
@@ -173,9 +167,6 @@ export default function UpdateSouvenier() {
     }
   };
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -469,19 +460,6 @@ export default function UpdateSouvenier() {
             />
           </FormGroup>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
           <Box
             sx={{
               flexGrow: 1,
@@ -556,7 +534,7 @@ export default function UpdateSouvenier() {
       </Drawer>
       <Box
         sx={{
-          height: "80vh auto",
+          maxHeight: "80vh",
           margin: "10vh",
           padding: "20px",
           width: "90vw",
@@ -566,6 +544,8 @@ export default function UpdateSouvenier() {
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
           marginBottom: "20px",
+          overflowY: "auto",
+          overflowX: "hidden",
         }}
       >
         <ToastContainer />
@@ -758,7 +738,7 @@ export default function UpdateSouvenier() {
                 id="outlined-basic"
                 label="Quantity "
                 variant="outlined"
-                value={quantity }
+                value={quantity}
                 onChange={(e) => {
                   handleQuantityChange(e);
                 }}

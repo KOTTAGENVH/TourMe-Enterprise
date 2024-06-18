@@ -37,13 +37,6 @@ function App() {
 
   const isMobileOrTablet = window.matchMedia("(max-width: 1024px)").matches;
 
-  const handleCss = () => {
-    if (darkmode) {
-      return "AppDarkmode";
-    } else {
-      return "App";
-    }
-  };
   return (
     <div
       style={{

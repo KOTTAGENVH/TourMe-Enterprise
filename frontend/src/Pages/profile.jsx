@@ -21,7 +21,7 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { useSelector } from "react-redux";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { setdarkmode } from "../Redux/darkmode/darkmodeAction";
 import { useDispatch } from "react-redux";
 import { signOutAction } from "../Redux/auth/authAction";
@@ -73,15 +73,11 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
 function Profile() {
-  const darkmode = useSelector((state) => state.darkmode.darkmode);
   const loggedUser = useSelector((state) => state.auth.loggedUser);
 
   const [open, setOpen] = React.useState(true);
   const settings = ["Profile", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
 
@@ -92,17 +88,6 @@ function Profile() {
     setOpen(!open);
   };
 
-  const handleColor = () => {
-    if (darkmode) {
-      return "white";
-    } else {
-      return "black";
-    }
-  };
-
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -205,19 +190,6 @@ function Profile() {
             />
           </FormGroup>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
           <Box
             sx={{
               flexGrow: 1,
@@ -300,6 +272,8 @@ function Profile() {
           boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
           backdropFilter: "blur(5px)",
           WebkitBackdropFilter: "blur(5px)",
+          height: "fit-content",
+          marginTop: "100px",
         }}
       >
         <Avatar

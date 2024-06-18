@@ -2,7 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authSlice from "./auth/authSlice";
-import { dark } from "@mui/material/styles/createPalette";
 import darkmodeSlice from "./darkmode/darkmodeSlice";
 import  idSlice  from "./storeid/storeidSlice";
 

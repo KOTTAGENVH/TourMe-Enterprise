@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled} from "@mui/material/styles";
 import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -47,24 +47,6 @@ import { storage } from "../../Api/firebase";
 import { useState } from "react";
 import * as Yup from "yup";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://tour-me-frontend.vercel.app/">
-        TourME(WEB)
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
@@ -111,11 +93,8 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
-
 export default function AddDestination() {
   const settings = ["Profile", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
@@ -173,9 +152,6 @@ export default function AddDestination() {
     }
   };
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -477,19 +453,6 @@ export default function AddDestination() {
             />
           </FormGroup>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
           <Box
             sx={{
               flexGrow: 1,
@@ -564,7 +527,7 @@ export default function AddDestination() {
       </Drawer>
       <Box
         sx={{
-          height: "80vh auto",
+          maxHeight: "80vh",
           margin: "10vh",
           padding: "20px",
           width: "90vw",
@@ -574,6 +537,8 @@ export default function AddDestination() {
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
           marginBottom: "20px",
+          overflowY: "auto",
+          overflowX: "hidden",
         }}
       >
         <ToastContainer />
@@ -834,6 +799,7 @@ export default function AddDestination() {
                     color: handleColor(),
                   }}
                   label="Telephone"
+                  helperText={telerror}
                 />
               </div>
               <Button

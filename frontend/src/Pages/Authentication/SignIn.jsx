@@ -25,16 +25,19 @@ function SignIn() {
         toast.error("Please fill all the fields");
         return;
       }
+      setLoading(true);
       const status = await dispatch(loginAction(username, password));
       if (status !== "Invalid Credentials") {
         toast.success("Login successful");
+        setLoading(false);
         navigate("/home");        
       } else {
-        console.log("status", status);
         toast.error("Invalid Credentials");
+        setLoading(false);
       }
     } catch (err) {
       toast.error("Sign In Failed");
+      setLoading(false);
     }
   };
 

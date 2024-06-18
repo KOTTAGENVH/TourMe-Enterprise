@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, createTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useQuery } from "react-query";
 import Carousel from "react-material-ui-carousel";
 import MuiDrawer from "@mui/material/Drawer";
@@ -95,12 +95,11 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function UpdateHotel() {
-  const { data, isLoading, error, isError } = useQuery({
+  const { data } = useQuery({
     queryFn: () => getHotelById(idState),
   });
 
   const settings = ["Profile", "Logout"];
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [darkMode, setDarkMode] = React.useState(false);
   const [image1, setImage1] = React.useState(null);
@@ -183,9 +182,6 @@ export default function UpdateHotel() {
     }
   };
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -485,19 +481,6 @@ export default function UpdateHotel() {
             />
           </FormGroup>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
           <Box
             sx={{
               flexGrow: 1,
@@ -572,7 +555,7 @@ export default function UpdateHotel() {
       </Drawer>
       <Box
         sx={{
-          height: "80vh auto",
+          maxHeight: "80vh",
           margin: "10vh",
           padding: "20px",
           width: "90vw",
@@ -582,6 +565,8 @@ export default function UpdateHotel() {
           backdropFilter: "blur(10px)",
           borderRadius: "20px",
           marginBottom: "20px",
+          overflowY: "auto", 
+          overflowX: "hidden", 
         }}
       >
         <ToastContainer />
