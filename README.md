@@ -37,3 +37,7 @@
 >Email: hotel@yahoo.com
 >
 >Password: Achi@123
+>
+>AdminAccess
+>
+>admin@123
